@@ -1,0 +1,19 @@
+{
+  "name": "feishu-multi-agent-manager",
+  "version": "1.0.0",
+  "description": "飞书多 Agent 管理器 - 支持主 Agent 自主创建子 Agent，用户可在 UI 界面直接配置多个飞书 Bot 凭证",
+  "author": "rfdiosuao",
+  "repository": "https://github.com/rfdiosuao/openclaw-skills",
+  "license": "MIT",
+  "tags": ["feishu", "multi-agent", "agent-management", "routing"],
+  "category": "Agent 管理",
+  "compatibility": {
+    "minOpenClawVersion": "2026.3.0"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/"
+  }
+}

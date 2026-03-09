@@ -1,0 +1,26 @@
+{
+  "name": "feishu-multi-agent-manager",
+  "version": "1.0.0",
+  "description": "飞书多 Agent 管理器 - 支持主 Agent 自主创建子 Agent，用户可在 UI 界面直接配置多个飞书 Bot 凭证",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["openclaw", "skill", "feishu", "multi-agent"],
+  "author": "rfdiosuao",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  }
+}
