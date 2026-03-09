@@ -1,23 +1,16 @@
-# 飞书多 Agent 管理器 🤖
+# 飞书多 Agent 配置助手 🤖
 
-> 主 Agent 自主创建子 Agent，用户可在 UI 界面直接配置多个飞书 Bot 凭证
+> **交互式引导版本** - 逐步指导用户创建多个飞书 Bot，配置多 Agent 系统
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/rfdiosuao/openclaw-skills)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/rfdiosuao/openclaw-skills)
 
 ---
 
 ## 📦 安装
 
 ```bash
-# 从 ClawHub 安装（待发布）
-openclaw skills install feishu-multi-agent-manager
-```
-
-### 本地安装
-
-```bash
-# 克隆仓库
+# 从 GitHub 克隆
 git clone https://github.com/rfdiosuao/openclaw-skills.git
 cd openclaw-skills/feishu-multi-agent-manager
 
@@ -32,254 +25,450 @@ npm run build
 
 ## 🚀 功能特性
 
-### ✨ 核心功能
+### ✨ v2.0 新增功能
 
-1. **主 Agent 自主创建子 Agent**
-   - 动态添加新 Agent 到 `openclaw.json`
-   - 自动生成工作区目录结构
-   - 自动生成 Agent 人设文件（SOUL.md、AGENTS.md、USER.md）
+1. **交互式配置向导** 🎯
+   - 逐步引导用户完成配置
+   - 询问用户要创建几个 Agent
+   - 提供预设角色推荐方案
 
-2. **飞书凭证配置**
-   - 在 UI 界面直接配置多个飞书 Bot 凭证
-   - 自动验证 AppID/AppSecret 格式
-   - 支持凭证更新和删除
+2. **飞书 Bot 创建教程** 📘
+   - 详细的图文教程
+   - 分步骤指导创建飞书应用
+   - 包含检查清单和注意事项
 
-3. **路由规则管理**
-   - 自动生成 bindings 配置
-   - 支持特定用户/群聊路由
-   - 自动添加到 agentToAgent 白名单
+3. **批量创建支持** 📦
+   - 一次性创建多个 Agent
+   - 自动验证每个凭证
+   - 详细的成功/失败报告
 
-4. **Agent 生命周期管理**
-   - 创建、列出、更新、删除 Agent
-   - 配置验证和错误处理
-   - 操作日志记录
+4. **预设角色模板** 🎭
+   - 6 个经典角色（大总管、开发、内容、运营、法务、财务）
+   - 每个角色包含完整人设文件
+   - 支持完全自定义
 
 ---
 
-## 📖 使用方式
+## 🎯 使用流程
 
-### 方式 1：通过消息调用
+### 步骤 1：启动配置向导
 
 ```typescript
-// 创建新 Agent
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'dev',
-  agentName: '开发助理',
-  appId: 'cli_xxxxxxxxxxxxxxx',
-  appSecret: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-  isDefault: false,
-  model: 'custom/qwen3.5-plus'
-});
+await main(ctx, { action: 'start_wizard' });
+```
 
-// 更新飞书凭证
-await main(ctx, {
-  action: 'update_credential',
-  agentId: 'dev',
-  appId: 'cli_new_app_id',
-  appSecret: 'new_app_secret_32_chars'
-});
+**Bot 回复：**
+```
+🤖 欢迎使用飞书多 Agent 配置助手！
 
-// 列出所有 Agent
-await main(ctx, {
-  action: 'list_agents'
-});
+我将引导你完成多个 Agent 的配置流程。
 
-// 删除 Agent
-await main(ctx, {
-  action: 'delete_agent',
-  agentId: 'dev'
+## 📋 配置流程
+1. 选择 Agent 数量 - 告诉我要创建几个 Agent
+2. 选择 Agent 角色 - 从预设角色中选择或自定义
+3. 创建飞书应用 - 我会提供详细的创建教程
+4. 配置凭证 - 逐个输入每个 Bot 的 App ID 和 App Secret
+5. 验证并生成 - 自动验证凭证并生成配置
+6. 重启生效 - 重启 OpenClaw 使配置生效
+
+## 🎯 预设角色推荐
+| 角色 | 职责 | 表情 |
+|------|------|------|
+| main | 大总管 - 统筹全局、分配任务 | 🎯 |
+| dev | 开发助理 - 代码开发、技术架构 | 🧑‍💻 |
+| content | 内容助理 - 内容创作、文案撰写 | ✍️ |
+| ops | 运营助理 - 用户增长、活动策划 | 📈 |
+| law | 法务助理 - 合同审核、合规咨询 | 📜 |
+| finance | 财务助理 - 账目统计、预算管理 | 💰 |
+
+## 🚀 快速开始
+**请告诉我：你想创建几个 Agent？**
+
+例如：
+- 3 个 - 我推荐：main（大总管）+ dev（开发）+ content（内容）
+- 6 个 - 完整团队：全部 6 个角色
+- 自定义 - 你自由选择角色
+
+回复数字或"自定义"，我们开始吧！😊
+```
+
+---
+
+### 步骤 2：选择 Agent 数量
+
+**用户回复：** `6 个`
+
+**Bot 回复：**
+```
+✅ 好的！我们将创建 6 个 Agent。
+
+## 📋 推荐方案
+推荐：完整 6 人团队 - main + dev + content + ops + law + finance
+
+## 🎯 请选择配置方式
+
+方式 1：使用预设角色
+回复「预设」或「模板」，我会按推荐方案自动配置
+
+方式 2：自定义角色
+回复「自定义」，然后告诉我你想用哪 6 个角色
+
+方式 3：完全自定义
+回复「全新」，每个角色都由你自由定义
+
+请选择（回复数字或关键词）：
+```
+
+---
+
+### 步骤 3：查看飞书创建教程
+
+```typescript
+await main(ctx, { 
+  action: 'show_tutorial',
+  step: 1,
+  agentName: '大总管'
 });
 ```
 
-### 方式 2：通过 Claw-CLI 调用
+**Bot 回复：**
+```
+## 📘 第 1 步：创建飞书应用「大总管」
 
+### 步骤 1: 登录飞书开放平台
+1. 访问 https://open.feishu.cn/
+2. 使用你的飞书账号登录
+
+### 步骤 2: 创建企业自建应用
+1. 点击右上角「创建应用」
+2. 选择「企业自建」
+3. 输入应用名称：大总管
+4. 点击「创建」
+
+### 步骤 3: 获取应用凭证
+1. 进入应用管理页面
+2. 点击左侧「凭证与基础信息」
+3. 复制 App ID（格式：cli_xxxxxxxxxxxxxxx）
+4. 复制 App Secret（32 位字符串）
+   - 如果看不到，点击「查看」或「重置」
+
+### 步骤 4: 开启机器人能力
+1. 点击左侧「功能」→「机器人」
+2. ✅ 开启「机器人能力」
+3. ✅ 开启「以机器人身份加入群聊」
+4. 点击「保存」
+
+### 步骤 5: 配置事件订阅
+1. 点击左侧「功能」→「事件订阅」
+2. 选择「长连接」模式（推荐）
+3. 勾选以下事件：
+   - ✅ im.message.receive_v1 - 接收消息
+   - ✅ im.message.read_v1 - 消息已读（可选）
+4. 点击「保存」
+
+### 步骤 6: 配置权限
+1. 点击左侧「功能」→「权限管理」
+2. 搜索并添加以下权限：
+   - ✅ im:message - 获取用户发给机器人的单聊消息
+   - ✅ im:chat - 获取群组中发给机器人的消息
+   - ✅ contact:user:readonly - 读取用户信息（可选）
+3. 点击「申请」
+
+### 步骤 7: 发布应用
+1. 点击左侧「版本管理与发布」
+2. 点击「创建版本」
+3. 填写版本号：1.0.0
+4. 点击「提交审核」（机器人类通常自动通过）
+5. 等待 5-10 分钟生效
+
+---
+
+### ✅ 完成检查清单
+- [ ] App ID 已复制（以 cli_ 开头）
+- [ ] App Secret 已复制（32 位字符串）
+- [ ] 机器人能力已开启
+- [ ] 事件订阅已配置（长连接模式）
+- [ ] 权限已申请（im:message, im:chat）
+- [ ] 应用已发布
+
+---
+
+**准备好后，请回复以下信息：**
+
+```
+第 1 个 Bot 配置完成：
+App ID: cli_xxxxxxxxxxxxxxx
+App Secret: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+我会帮你验证并添加到配置中！👍
+```
+
+---
+
+### 步骤 4：验证凭证
+
+```typescript
+await main(ctx, { 
+  action: 'validate_credentials',
+  appId: 'cli_xxx',
+  appSecret: 'xxx'
+});
+```
+
+**Bot 回复：**
+```
+✅ 凭证验证通过！
+
+App ID: cli_xxx
+App Secret: 12345678...（已隐藏）
+
+准备添加到配置，请确认：
+- 回复「确认」继续
+- 回复「取消」放弃
+- 回复「下一个」直接配置下一个
+```
+
+---
+
+### 步骤 5：批量创建 Agent
+
+```typescript
+await main(ctx, {
+  action: 'batch_create',
+  agents: [
+    {
+      agentId: 'main',
+      agentName: '大总管',
+      appId: 'cli_main_xxx',
+      appSecret: 'main_secret_xxx',
+      isDefault: true
+    },
+    {
+      agentId: 'dev',
+      agentName: '开发助理',
+      appId: 'cli_dev_xxx',
+      appSecret: 'dev_secret_xxx'
+    },
+    {
+      agentId: 'content',
+      agentName: '内容助理',
+      appId: 'cli_content_xxx',
+      appSecret: 'content_secret_xxx'
+    }
+  ]
+});
+```
+
+**Bot 回复：**
+```
+🎉 批量创建成功！
+
+✅ 已创建 3 个 Agent：
+1. main - ✅
+2. dev - ✅
+3. content - ✅
+
+---
+
+## 📝 下一步
+
+### 1. 重启 OpenClaw
 ```bash
-# 查看帮助
-claw skill feishu-multi-agent-manager --help
+openclaw restart
+```
 
-# 创建 Agent
-claw skill feishu-multi-agent-manager create \
-  --id dev \
-  --name "开发助理" \
-  --app-id cli_xxx \
-  --app-secret xxx
+### 2. 等待 Bot 上线
+重启后等待 1-2 分钟，所有 Bot 会自动连接飞书
 
-# 列出 Agent
-claw skill feishu-multi-agent-manager list
+### 3. 测试 Bot
+在飞书中搜索 Bot 名称，发送消息测试
 
-# 更新凭证
-claw skill feishu-multi-agent-manager update-credential \
-  --id dev \
-  --app-id cli_new \
-  --app-secret new_secret
+### 4. 查看日志
+```bash
+tail -f /home/node/.openclaw/run.log
+```
 
-# 删除 Agent
-claw skill feishu-multi-agent-manager delete --id dev
+---
+
+## 📚 配置详情
+
+所有 Agent 的配置已保存到：
+- 配置文件：/home/node/.openclaw/openclaw.json
+- 工作区：/home/node/.openclaw/workspace/[agentId]/
+- 人设文件：每个工作区包含 SOUL.md、AGENTS.md、USER.md
+
+---
+
+💡 提示：如果有任何 Bot 显示 offline，请检查飞书应用配置是否正确（凭证、事件订阅、权限）。
+
+需要帮助请回复「帮助」或「排查」！
 ```
 
 ---
 
 ## 📋 API 参考
 
-### `create_agent` - 创建新 Agent
-
-**参数：**
-
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `agentId` | string | ✅ | Agent 唯一标识（如 `dev`, `content`） |
-| `agentName` | string | ✅ | Agent 显示名称（如 `开发助理`） |
-| `appId` | string | ✅ | 飞书 App ID（以 `cli_` 开头） |
-| `appSecret` | string | ✅ | 飞书 App Secret（32 位字符串） |
-| `isDefault` | boolean | ❌ | 是否为默认 Agent |
-| `workspacePath` | string | ❌ | 自定义工作区路径 |
-| `model` | string | ❌ | 模型配置（默认：`custom/qwen3.5-plus`） |
-
-**返回：**
-```json
-{
-  "success": true,
-  "message": "Agent 创建成功"
-}
-```
-
-### `update_credential` - 更新飞书凭证
-
-**参数：**
-
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `agentId` | string | ✅ | Agent ID |
-| `appId` | string | ✅ | 新飞书 App ID |
-| `appSecret` | string | ✅ | 新飞书 App Secret |
-
-### `list_agents` - 列出所有 Agent
+### `start_wizard` - 启动配置向导
 
 **参数：** 无
 
-**返回：**
-```json
-[
-  {
-    "id": "main",
-    "name": "大总管",
-    "workspace": "/home/node/.openclaw/workspace/main",
-    "default": true
-  },
-  {
-    "id": "dev",
-    "name": "开发助理",
-    "workspace": "/home/node/.openclaw/workspace/dev"
-  }
-]
-```
+**说明：** 启动交互式配置向导，引导用户完成整个流程
 
-### `delete_agent` - 删除 Agent
+---
+
+### `select_count` - 选择 Agent 数量
 
 **参数：**
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `agentId` | string | ✅ | 要删除的 Agent ID |
+| `count` | string | ✅ | Agent 数量（1-10） |
 
-**注意：** 不能删除默认 Agent（`default: true`）
-
----
-
-## 🧪 测试
-
-```bash
-# 运行单元测试
-npm test
-
-# 运行并生成覆盖率报告
-npm test -- --coverage
+**示例：**
+```typescript
+await main(ctx, { action: 'select_count', count: '6' });
 ```
 
 ---
 
-## 📝 使用示例
+### `show_tutorial` - 显示飞书创建教程
 
-### 示例 1：创建 6 角色 Agent 团队
+**参数：**
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `step` | string | ✅ | 第几步（1-6） |
+| `agentName` | string | ✅ | Agent 名称 |
+
+**示例：**
 ```typescript
-// 创建大总管（默认 Agent）
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'main',
-  agentName: '大总管',
-  appId: 'cli_main_xxx',
-  appSecret: 'main_secret_xxx',
-  isDefault: true
-});
-
-// 创建开发助理
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'dev',
-  agentName: '开发助理',
-  appId: 'cli_dev_xxx',
-  appSecret: 'dev_secret_xxx'
-});
-
-// 创建内容助理
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'content',
-  agentName: '内容助理',
-  appId: 'cli_content_xxx',
-  appSecret: 'content_secret_xxx'
-});
-
-// 创建运营助理
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'ops',
-  agentName: '运营增长助理',
-  appId: 'cli_ops_xxx',
-  appSecret: 'ops_secret_xxx'
-});
-
-// 创建法务助理
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'law',
-  agentName: '法务助理',
-  appId: 'cli_law_xxx',
-  appSecret: 'law_secret_xxx'
-});
-
-// 创建财务助理
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'finance',
-  agentName: '财务助理',
-  appId: 'cli_finance_xxx',
-  appSecret: 'finance_secret_xxx'
+await main(ctx, { 
+  action: 'show_tutorial',
+  step: '1',
+  agentName: '大总管'
 });
 ```
 
-### 示例 2：动态添加新 Agent
+---
 
+### `validate_credentials` - 验证凭证
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `appId` | string | ✅ | 飞书 App ID |
+| `appSecret` | string | ✅ | 飞书 App Secret |
+
+**示例：**
 ```typescript
-// 用户说："我需要一个专门负责客服的 Agent"
-await main(ctx, {
-  action: 'create_agent',
-  agentId: 'support',
-  agentName: '客服助理',
-  appId: 'cli_support_xxx',
-  appSecret: 'support_secret_xxx'
+await main(ctx, { 
+  action: 'validate_credentials',
+  appId: 'cli_xxx',
+  appSecret: 'xxx'
 });
-
-// 回复用户
-await ctx.reply(`✅ 客服助理已创建！
-
-请在飞书开放平台配置应用后，重启 OpenClaw：
-\`\`\`bash
-openclaw restart
-\`\`\``);
 ```
+
+---
+
+### `batch_create` - 批量创建 Agent
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `agents` | Array | ✅ | Agent 列表 |
+
+**Agent 对象结构：**
+```typescript
+{
+  agentId: string;        // Agent 唯一标识
+  agentName: string;      // 显示名称
+  appId: string;          // 飞书 App ID
+  appSecret: string;      // 飞书 App Secret
+  isDefault?: boolean;    // 是否为默认 Agent
+  model?: string;         // 模型配置
+}
+```
+
+**示例：** 见上方步骤 5
+
+---
+
+### `show_status` - 显示当前配置状态
+
+**参数：** 无
+
+**示例：**
+```typescript
+await main(ctx, { action: 'show_status' });
+```
+
+---
+
+## 🎭 预设角色模板
+
+### 6 个经典角色
+
+| 角色 ID | 名称 | 职责 | 表情 |
+|--------|------|------|------|
+| **main** | 大总管 | 统筹全局、分配任务、跨 Agent 协调 | 🎯 |
+| **dev** | 开发助理 | 代码开发、技术架构、运维部署 | 🧑‍💻 |
+| **content** | 内容助理 | 内容创作、文案撰写、素材整理 | ✍️ |
+| **ops** | 运营助理 | 用户增长、数据分析、活动策划 | 📈 |
+| **law** | 法务助理 | 合同审核、合规咨询、风险规避 | 📜 |
+| **finance** | 财务助理 | 账目统计、成本核算、预算管理 | 💰 |
+
+每个角色包含：
+- ✅ 完整的 SOUL.md 人设文件
+- ✅ 核心职责说明
+- ✅ 工作准则
+- ✅ 协作方式
+
+---
+
+## 📝 使用场景
+
+### 场景 1：快速搭建 3 人团队
+
+**用户需求：** "我想创建 3 个 Agent"
+
+**流程：**
+1. 启动向导 → `start_wizard`
+2. 选择数量 → `select_count` (count: "3")
+3. 选择预设 → 自动推荐 main + dev + content
+4. 逐个配置 → 显示教程 → 验证凭证
+5. 批量创建 → `batch_create`
+6. 重启生效
+
+---
+
+### 场景 2：完整 6 人团队
+
+**用户需求：** "我要完整的 6 个角色"
+
+**流程：**
+1. 启动向导 → `start_wizard`
+2. 选择数量 → `select_count` (count: "6")
+3. 选择预设 → 自动配置全部 6 个角色
+4. 批量配置 → 一次性提供 6 个凭证
+5. 批量创建 → `batch_create`
+6. 重启生效
+
+---
+
+### 场景 3：完全自定义
+
+**用户需求：** "我要自定义 2 个特殊角色"
+
+**流程：**
+1. 启动向导 → `start_wizard`
+2. 选择数量 → `select_count` (count: "2")
+3. 选择自定义 → 用户提供角色名称和职责
+4. 生成人设 → 自动生成 SOUL.md
+5. 配置凭证 → 验证并创建
+6. 重启生效
 
 ---
 
@@ -287,7 +476,7 @@ openclaw restart
 
 ### openclaw.json 结构
 
-创建 Agent 后，`openclaw.json` 会自动更新：
+批量创建后，`openclaw.json` 会自动更新：
 
 ```json
 {
@@ -353,14 +542,78 @@ openclaw restart
 
 ---
 
+## 🧪 测试
+
+```bash
+# 运行单元测试
+npm test
+
+# 运行并生成覆盖率报告
+npm test -- --coverage
+```
+
+---
+
+## 🐛 问题排查
+
+### 问题 1：凭证验证失败
+
+**错误：** `❌ App ID 必须以 cli_ 开头`
+
+**解决：** 
+- 检查 App ID 是否正确复制
+- 确保以 `cli_` 开头
+- 不要包含空格或换行
+
+---
+
+### 问题 2：Agent ID 已存在
+
+**错误：** `❌ Agent ID "main" 已存在`
+
+**解决：**
+- 使用不同的 `agentId`
+- 或删除现有 Agent 后重试
+
+---
+
+### 问题 3：Bot 显示 offline
+
+**解决：**
+```bash
+# 1. 检查配置文件
+cat /home/node/.openclaw/openclaw.json | jq '.channels.feishu.accounts'
+
+# 2. 检查日志错误
+grep -i "error\|fail" /home/node/.openclaw/run.log | tail -20
+
+# 3. 测试飞书 API 连通性
+curl -X POST "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal" \
+  -H "Content-Type: application/json" \
+  -d '{"app_id":"cli_xxx","app_secret":"xxx"}'
+```
+
+**可能原因：**
+- ❌ AppID/AppSecret 填写错误
+- ❌ 飞书应用未发布
+- ❌ 事件订阅未配置
+- ❌ 权限未开通
+
+---
+
 ## 📝 更新日志
+
+### v2.0.0 (2026-03-09)
+- ✨ **交互式配置向导** - 逐步引导用户完成配置
+- ✨ **飞书创建教程** - 详细的图文教程
+- ✨ **批量创建支持** - 一次性创建多个 Agent
+- ✨ **预设角色模板** - 6 个经典角色
+- ✨ **凭证验证** - 自动验证 AppID/AppSecret 格式
+- ✨ **状态查询** - 显示当前配置状态
 
 ### v1.0.0 (2026-03-09)
 - ✨ 初始版本
 - ✅ 支持创建/列出/更新/删除 Agent
-- ✅ 自动验证飞书凭证格式
-- ✅ 自动生成工作区文件
-- ✅ 自动配置路由规则
 
 ---
 
@@ -381,29 +634,6 @@ openclaw restart
 
 ---
 
-## 🐛 问题排查
-
-### 问题 1：创建 Agent 失败
-
-**错误：** `Agent ID "xxx" 已存在`
-
-**解决：** 使用不同的 `agentId` 或先删除现有 Agent
-
-### 问题 2：凭证验证失败
-
-**错误：** `App ID 必须以 cli_ 开头`
-
-**解决：** 检查飞书 App ID 是否正确复制
-
-### 问题 3：配置不生效
-
-**解决：** 修改 `openclaw.json` 后需要重启 OpenClaw
-```bash
-openclaw restart
-```
-
----
-
 ## 📄 许可证
 
 MIT License
@@ -416,6 +646,7 @@ MIT License
 - [多 Agent 路由文档](https://clawd.org.cn/concepts/multi-agent.html)
 - [飞书开放平台](https://open.feishu.cn/)
 - [GitHub 仓库](https://github.com/rfdiosuao/openclaw-skills)
+- [ClawHub 技能市场](https://clawhub.ai)
 
 ---
 
