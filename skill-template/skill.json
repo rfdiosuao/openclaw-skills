@@ -1,0 +1,19 @@
+{
+  "name": "skill-name",
+  "version": "1.0.0",
+  "description": "Skill 描述",
+  "author": "rfdiosuao",
+  "repository": "https://github.com/rfdiosuao/openclaw-skills",
+  "license": "MIT",
+  "tags": ["tag1", "tag2"],
+  "category": "分类",
+  "compatibility": {
+    "minOpenClawVersion": "2026.3.0"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/"
+  }
+}
