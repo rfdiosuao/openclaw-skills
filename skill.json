@@ -1,0 +1,9 @@
+{
+  "name": "openclaw-mutual-repair",
+  "version": "1.0.0",
+  "description": "OpenClaw 双机互修助手 - 当有两只 OpenClaw 时互相修复对方问题",
+  "author": "OpenClaw Skill Master",
+  "license": "MIT",
+  "keywords": ["openclaw", "repair", "mutual", "stability", "monitor"],
+  "repository": "https://github.com/rfdiosuao/openclaw-skills/tree/main/openclaw-mutual-repair"
+}
