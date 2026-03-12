@@ -412,6 +412,7 @@ async function checkAndFailover() {
 ## 📚 参考资料
 
 - [OpenClaw 高并发稳定性优化文档](https://my.feishu.cn/docx/Tgu7dwKX5ol7m8xNF4ycadjznPe)
+- [飞书云文档 - 完整使用指南](https://www.feishu.cn/docx/VJlAdbqQkormQXxcCzVcNoRrnVh)
 - [PM2 生产环境部署](https://pm2.keymetrics.io/)
 - [Node.js 性能调优](https://nodejs.org/en/docs/guides/)
 - [Prometheus 监控](https://prometheus.io/)
