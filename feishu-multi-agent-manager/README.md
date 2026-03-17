@@ -3,7 +3,7 @@
 > **交互式引导版本** - 逐步指导用户创建多个飞书 Bot，配置多 Agent 系统
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/rfdiosuao/openclaw-skills)
+[![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)](https://github.com/rfdiosuao/openclaw-skills)
 
 ---
 
@@ -46,6 +46,53 @@ npm run build
    - 6 个经典角色（大总管、开发、内容、运营、法务、财务）
    - 每个角色包含完整人设文件
    - 支持完全自定义
+
+---
+
+## 🔄 更新日志
+
+### v2.0.1 (2026-03-17)
+
+**🐛 Bug 修复：**
+
+- **修复 accounts 配置格式问题** - 飞书插件要求 `accounts` 必须是对象格式（key 为 accountId），不能使用数组格式。v2.0.1 添加了自动检测和转换功能：
+  - 检测到数组格式时自动转换为对象格式
+  - 添加详细的格式说明文档
+  - 添加配置格式验证逻辑
+
+**📝 配置格式说明：**
+
+✅ 正确格式（对象格式）：
+```json
+{
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "accounts": {
+        "main": { "appId": "cli_xxx", "appSecret": "xxx" },
+        "dev": { "appId": "cli_yyy", "appSecret": "yyy" }
+      }
+    }
+  }
+}
+```
+
+❌ 错误格式（数组格式 - 不支持）：
+```json
+{
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "accounts": [
+        { "accountId": "main", "appId": "cli_xxx", "appSecret": "xxx" },
+        { "accountId": "dev", "appId": "cli_yyy", "appSecret": "yyy" }
+      ]
+    }
+  }
+}
+```
+
+**问题根因：** 使用数组格式时，飞书插件仅能识别数组中第一个元素（主账号），其余账号完全不会被加载。
 
 ---
 

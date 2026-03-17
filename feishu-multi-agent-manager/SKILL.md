@@ -3,7 +3,7 @@ id: feishu-multi-agent-manager
 owner_id: rfdiosuao
 name: 飞书多 Agent 配置助手
 description: 交互式引导配置多 Agent 系统，支持批量创建、凭证验证、角色模板
-version: 2.0.0
+version: 2.0.1
 icon: "\U0001F916"
 author: rfdiosuao
 metadata:
@@ -101,6 +101,58 @@ await main(ctx, { action: 'show_status' });
 5. **验证凭证** - 自动验证 AppID/AppSecret
 6. **批量创建** - 一次性创建所有 Agent
 7. **重启生效** - 重启 OpenClaw
+
+## ⚠️ 重要：配置格式说明
+
+### ✅ 正确格式（对象格式）
+
+```json
+{
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "accounts": {
+        "main": {
+          "appId": "cli_xxxxxxxxxxxxxxx",
+          "appSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "dev": {
+          "appId": "cli_yyyyyyyyyyyyyyy",
+          "appSecret": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+        }
+      }
+    }
+  }
+}
+```
+
+### ❌ 错误格式（数组格式 - 不支持！）
+
+```json
+{
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "accounts": [
+        {
+          "accountId": "main",
+          "appId": "cli_xxxxxxxxxxxxxxx",
+          "appSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        {
+          "accountId": "dev",
+          "appId": "cli_yyyyyyyyyyyyyyy",
+          "appSecret": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+        }
+      ]
+    }
+  }
+}
+```
+
+**问题说明：** 飞书插件要求 `accounts` 必须是**对象格式**，key 为 accountId。如果使用数组格式，插件仅能识别数组中第一个元素（主账号），其余账号完全不会被加载。
+
+**自动修复：** v2.0.1+ 版本会自动检测并转换数组格式为对象格式。
 
 ## 🎯 预设角色
 
