@@ -50,6 +50,8 @@ interface OpenClawConfig {
   channels: {
     feishu: {
       enabled: boolean;
+      // 重要：accounts 必须是对象格式，key 为 accountId，不能是数组
+      // 格式：{ "accountId1": { appId, appSecret }, "accountId2": { ... } }
       accounts: Record<string, FeishuAccount>;
     };
   };
@@ -254,7 +256,40 @@ const AGENT_TEMPLATES: Record<string, AgentTemplate> = {
  */
 function readOpenClawConfig(configPath: string): OpenClawConfig {
   const content = fs.readFileSync(configPath, 'utf-8');
-  return JSON.parse(content);
+  const config = JSON.parse(content);
+  
+  // 重要修复：确保 accounts 是对象格式，而不是数组
+  // 如果检测到 accounts 是数组，转换为对象格式
+  if (Array.isArray(config.channels?.feishu?.accounts)) {
+    console.warn('⚠️ 检测到 accounts 使用了数组格式，这是不被支持的！正在转换为对象格式...');
+    const accountsArray = config.channels.feishu.accounts;
+    const accountsObject: Record<string, FeishuAccount> = {};
+    
+    // 尝试从数组中提取第一个账号（如果有 accountId 字段）
+    if (accountsArray.length > 0 && accountsArray[0].accountId) {
+      accountsArray.forEach((account: any) => {
+        if (account.appId && account.appSecret) {
+          const accountId = account.accountId || account.appId.replace('cli_', '');
+          accountsObject[accountId] = {
+            appId: account.appId,
+            appSecret: account.appSecret
+          };
+        }
+      });
+    }
+    
+    config.channels.feishu.accounts = accountsObject;
+    console.log('✅ 已转换为对象格式：', Object.keys(accountsObject));
+  }
+  
+  // 确保 accounts 字段存在且为对象
+  if (!config.channels?.feishu?.accounts) {
+    if (!config.channels) config.channels = { feishu: { enabled: true, accounts: {} } };
+    if (!config.channels.feishu) config.channels.feishu = { enabled: true, accounts: {} };
+    config.channels.feishu.accounts = {};
+  }
+  
+  return config;
 }
 
 /**
