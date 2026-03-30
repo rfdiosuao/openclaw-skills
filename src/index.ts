@@ -1,473 +1,590 @@
 /**
- * OpenClaw 双机互修助手 - 核心实现
+ * OpenClaw 双机互修助手
  * 
- * 功能：
- * 1. 内存监控与泄漏检测
- * 2. 进程守护状态检查
- * 3. WebSocket 连接诊断
- * 4. 健康检查接口
- * 5. 双机互修协议
+ * 功能：双机心跳监控、故障检测、自动修复
+ * 作者：OpenClaw Skill Master
+ * 版本：1.0.0
  */
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import * as fs from 'fs';
-import * as path from 'path';
+import axios from 'axios';
 
-const execAsync = promisify(exec);
+// ==================== 配置 ====================
 
-// 工具函数：执行 shell 命令
-async function runCommand(command: string): Promise<{ stdout: string; stderr: string }> {
-  try {
-    const { stdout, stderr } = await execAsync(command, {
-      timeout: 30000,
-      maxBuffer: 10 * 1024 * 1024
-    });
-    return { stdout, stderr };
-  } catch (error: any) {
-    throw new Error(`命令执行失败：${command}\n错误：${error.message}`);
-  }
+interface MutualRepairConfig {
+  // 本机配置
+  localHost: string;
+  localPort: number;
+  // 对端配置
+  remoteHost: string;
+  remotePort: number;
+  // 心跳配置
+  heartbeatInterval: number; // 毫秒，默认 5 分钟
+  heartbeatTimeout: number;  // 毫秒，默认 30 秒
+  // 告警配置
+  memoryThreshold: number;   // 内存告警阈值，默认 85%
+  cpuThreshold: number;      // CPU 告警阈值，默认 80%
 }
 
-// 工具函数：读取 JSON 配置文件
-function readConfig(configPath: string): any {
-  try {
-    const content = fs.readFileSync(configPath, 'utf-8');
-    // 支持 JSON5（移除注释）
-    const cleaned = content.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
-    return JSON.parse(cleaned);
-  } catch (error: any) {
-    throw new Error(`读取配置失败：${error.message}`);
-  }
+// ==================== 心跳协议 ====================
+
+interface HeartbeatRequest {
+  type: 'heartbeat';
+  timestamp: number;
+  source: {
+    host: string;
+    port: number;
+  };
+  health: {
+    status: 'ok' | 'warning' | 'critical';
+    memory: number;
+    cpu: number;
+    uptime: number;
+    connections: number;
+  };
 }
 
-// 1. 内存监控
-export async function checkMemory(): Promise<any> {
-  try {
-    // 获取 Node.js 进程内存使用
-    const { stdout } = await runCommand('ps aux | grep -E "node|openclaw" | grep -v grep | head -5');
-    
-    const memoryInfo: any = {
-      status: 'ok',
-      processes: [],
-      recommendations: []
-    };
-    
-    const lines = stdout.trim().split('\n');
-    for (const line of lines) {
-      const parts = line.split(/\s+/);
-      const cpu = parseFloat(parts[2]);
-      const mem = parseFloat(parts[3]);
-      const pid = parts[1];
-      const command = parts.slice(10).join(' ');
-      
-      memoryInfo.processes.push({ pid, cpu, mem, command });
-      
-      if (mem > 85) {
-        memoryInfo.status = 'warning';
-        memoryInfo.recommendations.push(`进程 ${pid} 内存使用过高 (${mem}%)，建议配置 max_memory_restart`);
-      }
-    }
-    
-    // 检查系统总内存
-    const { stdout: freeOutput } = await runCommand('free -m');
-    const memLines = freeOutput.split('\n');
-    const memInfo = memLines[1].split(/\s+/).slice(1).map(Number);
-    
-    memoryInfo.system = {
-      total: memInfo[0],
-      used: memInfo[1],
-      free: memInfo[2],
-      usage: Math.round((memInfo[1] / memInfo[0]) * 100)
-    };
-    
-    if (memoryInfo.system.usage > 85) {
-      memoryInfo.status = 'warning';
-      memoryInfo.recommendations.push(`系统内存使用率 ${memoryInfo.system.usage}%，建议检查内存泄漏`);
-    }
-    
-    return memoryInfo;
-  } catch (error: any) {
-    return {
-      status: 'error',
-      error: error.message
-    };
-  }
+interface HeartbeatResponse {
+  type: 'heartbeat_ack';
+  timestamp: number;
+  status: 'ok' | 'warning' | 'critical';
+  message?: string;
 }
 
-// 2. PM2 进程守护检查
-export async function checkPM2(): Promise<any> {
-  try {
-    // 检查 PM2 是否安装
-    try {
-      await runCommand('pm2 --version');
-    } catch {
-      return {
-        status: 'error',
-        message: 'PM2 未安装',
-        installGuide: 'npm install -g pm2'
-      };
-    }
-    
-    // 获取 PM2 进程列表
-    const { stdout } = await runCommand('pm2 list --json');
-    const processes = JSON.parse(stdout);
-    
-    const pm2Status: any = {
-      status: 'ok',
-      processes: [],
-      recommendations: []
-    };
-    
-    for (const proc of processes) {
-      const procInfo: any = {
-        name: proc.name,
-        status: proc.status,
-        pid: proc.pid,
-        memory: proc.monit.memory,
-        cpu: proc.monit.cpu,
-        uptime: proc.pm2_env?.pm_uptime,
-        restarts: proc.pm2_env?.restart_time
-      };
-      
-      pm2Status.processes.push(procInfo);
-      
-      // 检查异常状态
-      if (proc.status !== 'online') {
-        pm2Status.status = 'warning';
-        pm2Status.recommendations.push(`进程 ${proc.name} 状态异常：${proc.status}`);
-      }
-      
-      if (proc.monit.memory > 1024 * 1024 * 1024) { // 1GB
-        pm2Status.status = 'warning';
-        pm2Status.recommendations.push(`进程 ${proc.name} 内存使用过高：${Math.round(proc.monit.memory / 1024 / 1024)}MB`);
-      }
-      
-      if (proc.pm2_env?.restart_time > 10) {
-        pm2Status.status = 'warning';
-        pm2Status.recommendations.push(`进程 ${proc.name} 重启次数过多：${proc.pm2_env.restart_time}次`);
-      }
-    }
-    
-    return pm2Status;
-  } catch (error: any) {
-    return {
-      status: 'error',
-      error: error.message
-    };
-  }
+interface RepairRequest {
+  type: 'repair';
+  timestamp: number;
+  source: {
+    host: string;
+    port: number;
+  };
+  action: 'check' | 'restart' | 'diagnose';
+  target?: string;
 }
 
-// 3. systemd 服务检查
-export async function checkSystemd(): Promise<any> {
-  try {
-    // 检查 OpenClaw 服务状态
-    const { stdout } = await runCommand('systemctl status openclaw --no-pager');
-    
-    const systemdStatus: any = {
-      status: 'ok',
-      active: false,
-      subState: '',
-      mainPid: null,
-      memoryUsage: null,
-      recommendations: []
-    };
-    
-    // 解析 systemctl 输出
-    const lines = stdout.split('\n');
-    for (const line of lines) {
-      if (line.includes('Active:')) {
-        systemdStatus.active = line.includes('active (running)');
-        systemdStatus.subState = line.match(/active \((\w+)\)/)?.[1] || '';
-      }
-      if (line.includes('Main PID:')) {
-        systemdStatus.mainPid = line.match(/Main PID: (\d+)/)?.[1];
-      }
-      if (line.includes('Memory:')) {
-        systemdStatus.memoryUsage = line.match(/Memory: (.+)/)?.[1];
-      }
-    }
-    
-    if (!systemdStatus.active) {
-      systemdStatus.status = 'warning';
-      systemdStatus.recommendations.push('OpenClaw 服务未运行，建议启动：sudo systemctl start openclaw');
-    }
-    
-    return systemdStatus;
-  } catch (error: any) {
-    // 服务可能不存在
-    if (error.message.includes('Unit openclaw.service not found')) {
-      return {
-        status: 'info',
-        message: '未配置 systemd 服务',
-        setupGuide: '参考文档创建 /etc/systemd/system/openclaw.service'
-      };
-    }
-    
-    return {
-      status: 'error',
-      error: error.message
-    };
-  }
+interface RepairResponse {
+  type: 'repair_ack';
+  timestamp: number;
+  success: boolean;
+  result?: any;
+  error?: string;
 }
 
-// 4. WebSocket 连接诊断
-export async function checkWebSocket(): Promise<any> {
-  try {
-    // 检查网络连接
-    const { stdout: netstat } = await runCommand('netstat -an | grep ESTABLISHED | grep -E "18789|443|80" | wc -l');
-    const establishedConnections = parseInt(netstat.trim());
-    
-    // 检查 OpenClaw 网关状态
-    let gatewayStatus = 'unknown';
-    try {
-      const { stdout: health } = await runCommand('curl -s -o /dev/null -w "%{http_code}" http://localhost:18789/health || echo "failed"');
-      gatewayStatus = health.trim();
-    } catch {
-      gatewayStatus = 'unreachable';
-    }
-    
-    const wsStatus: any = {
-      status: 'ok',
-      establishedConnections,
-      gatewayStatus,
-      recommendations: []
+// ==================== 健康检查 ====================
+
+interface HealthStatus {
+  status: 'ok' | 'warning' | 'critical';
+  memory: {
+    used: number;
+    total: number;
+    percent: number;
+  };
+  cpu: {
+    percent: number;
+  };
+  uptime: number;
+  connections: {
+    websocket: number;
+    http: number;
+  };
+  processes: {
+    pm2?: {
+      status: 'online' | 'stopped' | 'errored';
+      memory: number;
+      restarts: number;
     };
-    
-    if (gatewayStatus !== '200' && gatewayStatus !== 'unknown') {
-      wsStatus.status = 'warning';
-      wsStatus.recommendations.push('网关健康检查失败，请检查 Gateway 状态');
-    }
-    
-    if (establishedConnections < 5) {
-      wsStatus.status = 'info';
-      wsStatus.recommendations.push('活跃连接数较少，可能是正常空闲状态');
-    }
-    
-    // 检查最近的断连日志
-    try {
-      const logPath = '/home/node/.openclaw/logs/combined.log';
-      if (fs.existsSync(logPath)) {
-        const { stdout: recentLogs } = await runCommand(`tail -100 ${logPath} | grep -i "disconnect\\|reconnect" | tail -10`);
-        if (recentLogs.trim()) {
-          wsStatus.recentDisconnects = recentLogs.trim().split('\n');
-          if (wsStatus.recentDisconnects.length > 5) {
-            wsStatus.status = 'warning';
-            wsStatus.recommendations.push('检测到频繁断连，建议检查网络和心跳配置');
-          }
-        }
-      }
-    } catch {
-      // 日志文件可能不存在
-    }
-    
-    return wsStatus;
-  } catch (error: any) {
-    return {
-      status: 'error',
-      error: error.message
-    };
-  }
+  };
 }
 
-// 5. 全面健康检查
-export async function healthCheck(): Promise<any> {
-  const [memory, pm2, systemd, websocket] = await Promise.all([
-    checkMemory(),
-    checkPM2(),
-    checkSystemd(),
-    checkWebSocket()
-  ]);
-  
-  // 计算整体健康状态
-  let overallStatus = 'healthy';
-  const warnings: string[] = [];
-  
-  if (memory.status === 'warning' || memory.status === 'error') {
-    overallStatus = 'degraded';
-    warnings.push('内存监控异常');
-  }
-  
-  if (pm2.status === 'warning' || pm2.status === 'error') {
-    overallStatus = 'degraded';
-    warnings.push('PM2 进程异常');
-  }
-  
-  if (systemd.status === 'warning' || systemd.status === 'error') {
-    overallStatus = 'degraded';
-    warnings.push('systemd 服务异常');
-  }
-  
-  if (websocket.status === 'warning' || websocket.status === 'error') {
-    overallStatus = 'degraded';
-    warnings.push('WebSocket 连接异常');
-  }
-  
-  return {
-    status: overallStatus,
-    timestamp: new Date().toISOString(),
+async function checkSystemHealth(): Promise<HealthStatus> {
+  const health: HealthStatus = {
+    status: 'ok',
+    memory: { used: 0, total: 0, percent: 0 },
+    cpu: { percent: 0 },
     uptime: process.uptime(),
-    checks: {
-      memory,
-      pm2,
-      systemd,
-      websocket
-    },
-    warnings,
-    recommendations: [
-      ...memory.recommendations || [],
-      ...pm2.recommendations || [],
-      ...systemd.recommendations || [],
-      ...websocket.recommendations || []
-    ]
+    connections: { websocket: 0, http: 0 },
+    processes: {}
   };
-}
 
-// 6. 生成优化配置
-export async function generateOptimizedConfig(): Promise<string> {
-  const configTemplate = {
-    identity: {
-      name: "OpenClaw",
-      theme: "stable production instance",
-      emoji: "⚡"
-    },
-    agents: {
-      defaults: {
-        workspace: "~/.openclaw/workspace",
-        model: {
-          primary: "anthropic/claude-sonnet-4-5",
-          fallbacks: ["anthropic/claude-opus-4-6"]
-        },
-        heartbeat: {
-          every: "30m",
-          target: "last"
-        },
-        sandbox: {
-          mode: "non-main"
+  try {
+    // 内存检查
+    const memInfo = await execPromise('free -m');
+    const memLines = memInfo.split('\n');
+    const memTotal = parseInt(memLines[1].split(/\s+/)[1]);
+    const memUsed = parseInt(memLines[1].split(/\s+/)[2]);
+    health.memory.total = memTotal;
+    health.memory.used = memUsed;
+    health.memory.percent = Math.round((memUsed / memTotal) * 100);
+
+    if (health.memory.percent > 85) {
+      health.status = 'warning';
+    }
+    if (health.memory.percent > 95) {
+      health.status = 'critical';
+    }
+
+    // CPU 检查
+    const cpuInfo = await execPromise('top -bn1 | grep "Cpu(s)"');
+    const cpuPercent = parseFloat(cpuInfo.split(',')[0].split(':')[1].trim());
+    health.cpu.percent = cpuPercent;
+
+    if (cpuPercent > 80) {
+      health.status = health.status === 'critical' ? 'critical' : 'warning';
+    }
+
+    // PM2 进程检查
+    try {
+      const pm2Status = await execPromise('pm2 list --json');
+      const processes = JSON.parse(pm2Status);
+      const openclawProc = processes.find((p: any) => p.name === 'openclaw');
+      
+      if (openclawProc) {
+        health.processes.pm2 = {
+          status: openclawProc.status as 'online' | 'stopped' | 'errored',
+          memory: openclawProc.monit.memory,
+          restarts: openclawProc.pm2_env?.restart_time || 0
+        };
+
+        if (openclawProc.status !== 'online') {
+          health.status = 'critical';
+        }
+        if ((openclawProc.pm2_env?.restart_time || 0) > 5) {
+          health.status = health.status === 'critical' ? 'critical' : 'warning';
         }
       }
-    },
-    session: {
-      dmScope: "per-channel-peer",
-      reset: {
-        mode: "daily",
-        atHour: 4,
-        idleMinutes: 120
-      }
-    },
-    tools: {
-      allow: ["exec", "process", "read", "write", "edit"],
-      exec: {
-        backgroundMs: 10000,
-        timeoutSec: 1800
-      }
-    },
-    gateway: {
-      port: 18789,
-      bind: "loopback",
-      reload: {
-        mode: "hybrid",
-        debounceMs: 300
-      }
+    } catch (e) {
+      // PM2 未安装或无 openclaw 进程
     }
-  };
-  
-  return JSON.stringify(configTemplate, null, 2);
+
+    // 连接数检查
+    try {
+      const connInfo = await execPromise('ss -tan | grep ESTAB | wc -l');
+      health.connections.http = parseInt(connInfo.trim());
+    } catch (e) {
+      // 忽略
+    }
+
+  } catch (error) {
+    console.error('Health check failed:', error);
+    health.status = 'warning';
+  }
+
+  return health;
 }
 
-// 7. 修复建议生成器
-export function generateRepairSuggestions(healthReport: any): string[] {
+function execPromise(command: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const { exec } = require('child_process');
+    exec(command, (error: any, stdout: string, stderr: string) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(stdout);
+      }
+    });
+  });
+}
+
+// ==================== 心跳服务 ====================
+
+class HeartbeatService {
+  private config: MutualRepairConfig;
+  private lastRemoteHeartbeat: number = 0;
+  private heartbeatTimer: NodeJS.Timeout | null = null;
+  private checkTimer: NodeJS.Timeout | null = null;
+
+  constructor(config: MutualRepairConfig) {
+    this.config = config;
+  }
+
+  async start() {
+    console.log('[Heartbeat] Starting heartbeat service...');
+    console.log(`[Heartbeat] Local: ${this.config.localHost}:${this.config.localPort}`);
+    console.log(`[Heartbeat] Remote: ${this.config.remoteHost}:${this.config.remotePort}`);
+
+    // 启动心跳发送
+    this.heartbeatTimer = setInterval(
+      () => this.sendHeartbeat(),
+      this.config.heartbeatInterval
+    );
+
+    // 启动远程心跳检查
+    this.checkTimer = setInterval(
+      () => this.checkRemoteHeartbeat(),
+      this.config.heartbeatInterval / 2
+    );
+
+    // 立即发送一次
+    await this.sendHeartbeat();
+  }
+
+  stop() {
+    if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+    if (this.checkTimer) clearInterval(this.checkTimer);
+    console.log('[Heartbeat] Heartbeat service stopped');
+  }
+
+  private async sendHeartbeat() {
+    try {
+      const health = await checkSystemHealth();
+      
+      const payload: HeartbeatRequest = {
+        type: 'heartbeat',
+        timestamp: Date.now(),
+        source: {
+          host: this.config.localHost,
+          port: this.config.localPort
+        },
+        health: {
+          status: health.status,
+          memory: health.memory.percent,
+          cpu: health.cpu.percent,
+          uptime: Math.round(health.uptime),
+          connections: health.connections.websocket + health.connections.http
+        }
+      };
+
+      const url = `http://${this.config.remoteHost}:${this.config.remotePort}/api/heartbeat`;
+      const response = await axios.post(url, payload, {
+        timeout: this.config.heartbeatTimeout
+      });
+
+      console.log('[Heartbeat] Sent to remote:', response.data);
+      this.lastRemoteHeartbeat = Date.now();
+
+    } catch (error: any) {
+      console.error('[Heartbeat] Failed to send:', error.message);
+      
+      // 如果连续失败，触发告警
+      if (Date.now() - this.lastRemoteHeartbeat > this.config.heartbeatInterval * 3) {
+        await this.handleRemoteDown();
+      }
+    }
+  }
+
+  private async checkRemoteHeartbeat() {
+    const elapsed = Date.now() - this.lastRemoteHeartbeat;
+    const threshold = this.config.heartbeatInterval * 2;
+
+    if (elapsed > threshold && this.lastRemoteHeartbeat > 0) {
+      console.error(`[Heartbeat] Remote heartbeat missing for ${elapsed}ms`);
+      await this.handleRemoteDown();
+    }
+  }
+
+  private async handleRemoteDown() {
+    console.error('[Heartbeat] Remote node appears to be DOWN!');
+    
+    // 尝试远程诊断
+    try {
+      await this.diagnoseRemote();
+    } catch (error) {
+      console.error('[Heartbeat] Remote diagnosis failed:', error);
+    }
+  }
+
+  private async diagnoseRemote() {
+    console.log('[Diagnosis] Attempting remote diagnosis...');
+    
+    // 尝试 SSH 连接诊断（需要配置 SSH 密钥）
+    // 这里提供诊断逻辑框架
+    const diagnosis = {
+      reachable: false,
+      issues: [] as string[],
+      suggestions: [] as string[]
+    };
+
+    // 检查网络连通性
+    try {
+      await execPromise(`ping -c 1 ${this.config.remoteHost}`);
+      diagnosis.reachable = true;
+    } catch (e) {
+      diagnosis.issues.push('网络不可达');
+      diagnosis.suggestions.push('检查网络连接和防火墙');
+    }
+
+    // 检查端口
+    try {
+      await execPromise(`nc -z ${this.config.remoteHost} ${this.config.remotePort}`);
+    } catch (e) {
+      diagnosis.issues.push(`端口 ${this.config.remotePort} 未开放`);
+      diagnosis.suggestions.push('检查 OpenClaw 是否运行');
+    }
+
+    console.log('[Diagnosis] Result:', diagnosis);
+    return diagnosis;
+  }
+
+  // HTTP 服务器 - 接收对端心跳
+  createServer() {
+    const http = require('http');
+    
+    const server = http.createServer(async (req: any, res: any) => {
+      if (req.method === 'POST' && req.url === '/api/heartbeat') {
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk);
+        req.on('end', async () => {
+          try {
+            const heartbeat: HeartbeatRequest = JSON.parse(body);
+            console.log('[Heartbeat] Received from remote:', heartbeat);
+            
+            this.lastRemoteHeartbeat = Date.now();
+            
+            // 检查对端健康状态
+            if (heartbeat.health.status === 'critical') {
+              console.warn('[Heartbeat] Remote node in CRITICAL state!');
+              await this.offerHelp(heartbeat);
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              type: 'heartbeat_ack',
+              timestamp: Date.now(),
+              status: 'ok'
+            }));
+          } catch (error: any) {
+            res.writeHead(400);
+            res.end(JSON.stringify({ error: error.message }));
+          }
+        });
+      } else if (req.method === 'POST' && req.url === '/api/repair') {
+        // 处理修复请求
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk);
+        req.on('end', async () => {
+          try {
+            const repair: RepairRequest = JSON.parse(body);
+            console.log('[Repair] Received request:', repair);
+            
+            const result = await this.executeRepair(repair);
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              type: 'repair_ack',
+              timestamp: Date.now(),
+              success: true,
+              result
+            }));
+          } catch (error: any) {
+            res.writeHead(500);
+            res.end(JSON.stringify({
+              type: 'repair_ack',
+              success: false,
+              error: error.message
+            }));
+          }
+        });
+      } else {
+        res.writeHead(404);
+        res.end('Not Found');
+      }
+    });
+
+    server.listen(this.config.localPort, this.config.localHost, () => {
+      console.log(`[Server] Listening on ${this.config.localHost}:${this.config.localPort}`);
+    });
+
+    return server;
+  }
+
+  private async offerHelp(heartbeat: HeartbeatRequest) {
+    console.log('[Help] Offering help to remote node...');
+    
+    // 发送修复建议
+    const suggestions = [];
+    
+    if (heartbeat.health.memory > 85) {
+      suggestions.push('内存使用率高，建议重启 OpenClaw 进程');
+    }
+    if (heartbeat.health.cpu > 80) {
+      suggestions.push('CPU 使用率高，检查是否有死循环或大量计算');
+    }
+
+    if (suggestions.length > 0) {
+      console.log('[Help] Suggestions:', suggestions);
+      // 可以通过 SSH 或其他方式执行修复
+    }
+  }
+
+  private async executeRepair(repair: RepairRequest) {
+    switch (repair.action) {
+      case 'check':
+        return await checkSystemHealth();
+      
+      case 'restart':
+        return await this.restartOpenClaw();
+      
+      case 'diagnose':
+        return await this.diagnoseLocal();
+      
+      default:
+        throw new Error(`Unknown repair action: ${repair.action}`);
+    }
+  }
+
+  private async restartOpenClaw() {
+    console.log('[Repair] Restarting OpenClaw...');
+    try {
+      await execPromise('pm2 restart openclaw');
+      return { success: true, message: 'OpenClaw restarted' };
+    } catch (error: any) {
+      try {
+        await execPromise('systemctl restart openclaw');
+        return { success: true, message: 'OpenClaw restarted via systemd' };
+      } catch (e: any) {
+        throw new Error('Failed to restart OpenClaw: ' + e.message);
+      }
+    }
+  }
+
+  private async diagnoseLocal() {
+    return await checkSystemHealth();
+  }
+}
+
+// ==================== Skill 导出 ====================
+
+export default {
+  name: 'openclaw-mutual-repair',
+  version: '1.0.0',
+  description: 'OpenClaw 双机互修助手 - 实现双机心跳监控和自动修复',
+  
+  triggers: [
+    '心跳', 'heartbeat', '互修', 'mutual', '修复', 'repair',
+    '监控', 'monitor', '健康', 'health', '诊断', 'diagnose'
+  ],
+
+  async execute(context: any) {
+    const { message, config } = context;
+    const text = message?.content?.toLowerCase() || '';
+
+    // 初始化双机互修服务
+    const mutualConfig: MutualRepairConfig = {
+      localHost: config?.localHost || '0.0.0.0',
+      localPort: config?.localPort || 9528,
+      remoteHost: config?.remoteHost || '192.168.1.101',
+      remotePort: config?.remotePort || 9528,
+      heartbeatInterval: config?.heartbeatInterval || 300000, // 5 分钟
+      heartbeatTimeout: config?.heartbeatTimeout || 30000,    // 30 秒
+      memoryThreshold: config?.memoryThreshold || 85,
+      cpuThreshold: config?.cpuThreshold || 80
+    };
+
+    if (text.includes('启动') || text.includes('start')) {
+      const service = new HeartbeatService(mutualConfig);
+      service.createServer();
+      await service.start();
+      
+      return {
+        content: `## ✅ 双机互修服务已启动\n\n**本机：** ${mutualConfig.localHost}:${mutualConfig.localPort}\n**对端：** ${mutualConfig.remoteHost}:${mutualConfig.remotePort}\n**心跳间隔：** ${mutualConfig.heartbeatInterval / 1000}秒\n\n服务正在后台运行，自动监控对端健康状态。`
+      };
+    }
+
+    if (text.includes('停止') || text.includes('stop')) {
+      // 需要在外部维护 service 实例
+      return {
+        content: '## ⚠️ 停止服务\n\n请通过进程管理工具停止服务，或重启 OpenClaw。'
+      };
+    }
+
+    if (text.includes('状态') || text.includes('status') || text.includes('健康')) {
+      const health = await checkSystemHealth();
+      
+      return {
+        content: `## 🏥 健康检查结果\n\n**整体状态：** ${getStatusEmoji(health.status)} ${health.status.toUpperCase()}\n\n### 资源使用\n- **内存：** ${health.memory.percent}% (${health.memory.used}MB / ${health.memory.total}MB)\n- **CPU：** ${health.cpu.percent}%\n- **运行时间：** ${formatUptime(health.uptime)}\n\n### 进程状态\n${health.processes.pm2 
+  ? `- **PM2 状态：** ${health.processes.pm2.status}\n- **进程内存：** ${health.processes.pm2.memory}MB\n- **重启次数：** ${health.processes.pm2.restarts}`
+  : '- PM2 未检测到 OpenClaw 进程'
+}\n\n### 建议\n${getSuggestions(health)}`
+      };
+    }
+
+    if (text.includes('诊断') || text.includes('diagnose')) {
+      const health = await checkSystemHealth();
+      const diagnosis = await diagnoseIssues(health);
+      
+      return {
+        content: `## 🔍 诊断报告\n\n${diagnosis.map((d: any) => `- **${d.issue}**\n  - 建议：${d.suggestion}`).join('\n')}`
+      };
+    }
+
+    // 默认帮助
+    return {
+      content: `## 🤖 双机互修助手\n\n**可用命令：**\n- \`启动互修\` - 启动双机心跳监控\n- \`停止互修\` - 停止监控服务\n- \`健康检查\` / \`状态\` - 检查本机健康状态\n- \`诊断\` - 诊断潜在问题\n\n**配置项：**\n- localHost/localPort - 本机地址\n- remoteHost/remotePort - 对端地址\n- heartbeatInterval - 心跳间隔（毫秒）`
+    };
+  }
+};
+
+// ==================== 辅助函数 ====================
+
+function getStatusEmoji(status: string): string {
+  switch (status) {
+    case 'ok': return '✅';
+    case 'warning': return '⚠️';
+    case 'critical': return '🚨';
+    default: return '❓';
+  }
+}
+
+function formatUptime(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours}小时${minutes}分钟`;
+}
+
+function getSuggestions(health: HealthStatus): string {
   const suggestions: string[] = [];
   
-  // 内存相关建议
-  if (healthReport.checks.memory?.system?.usage > 85) {
-    suggestions.push(
-      '🔴 内存使用率过高，建议：\n' +
-      '1. 配置 PM2 max_memory_restart: 1G\n' +
-      '2. 检查内存泄漏（使用 clinic.js）\n' +
-      '3. 考虑增加系统内存或优化代码'
-    );
+  if (health.memory.percent > 85) {
+    suggestions.push('- ⚠️ 内存使用率高，建议配置 PM2 max_memory_restart');
+  }
+  if (health.cpu.percent > 80) {
+    suggestions.push('- ⚠️ CPU 使用率高，检查是否有性能瓶颈');
+  }
+  if (health.processes.pm2 && health.processes.pm2.restarts > 5) {
+    suggestions.push('- ⚠️ 进程重启频繁，检查日志排查崩溃原因');
+  }
+  if (health.processes.pm2 && health.processes.pm2.status !== 'online') {
+    suggestions.push('- 🚨 OpenClaw 进程未运行，立即重启！');
   }
   
-  // PM2 相关建议
-  if (healthReport.checks.pm2?.status === 'warning') {
-    suggestions.push(
-      '🟡 PM2 进程异常，建议：\n' +
-      '1. 检查 PM2 日志：pm2 logs\n' +
-      '2. 重启异常进程：pm2 restart all\n' +
-      '3. 配置自动重启：autorestart: true'
-    );
-  }
-  
-  // systemd 相关建议
-  if (healthReport.checks.systemd?.status === 'warning') {
-    suggestions.push(
-      '🟡 systemd 服务未运行，建议：\n' +
-      '1. 启动服务：sudo systemctl start openclaw\n' +
-      '2. 查看状态：systemctl status openclaw\n' +
-      '3. 查看日志：journalctl -u openclaw -n 50'
-    );
-  }
-  
-  // WebSocket 相关建议
-  if (healthReport.checks.websocket?.status === 'warning') {
-    suggestions.push(
-      '🟡 WebSocket 连接异常，建议：\n' +
-      '1. 检查 Gateway 状态：openclaw gateway status\n' +
-      '2. 配置心跳保活：heartbeat.interval: 30000\n' +
-      '3. 配置指数退避重连'
-    );
-  }
-  
-  // 如果没有警告
-  if (suggestions.length === 0) {
-    suggestions.push('✅ 系统运行正常，无需修复');
-  }
-  
-  return suggestions;
+  return suggestions.length > 0 
+    ? suggestions.join('\n') 
+    : '- ✅ 一切正常，无需干预';
 }
 
-// 主导出函数
-export default async function mutualRepair(query: string): Promise<string> {
-  const lowerQuery = query.toLowerCase();
+async function diagnoseIssues(health: HealthStatus) {
+  const issues: any[] = [];
   
-  // 内存检查
-  if (lowerQuery.includes('内存') || lowerQuery.includes('memory') || lowerQuery.includes('泄漏')) {
-    const result = await checkMemory();
-    return `## 🔍 内存检查结果\n\n${JSON.stringify(result, null, 2)}`;
+  if (health.memory.percent > 85) {
+    issues.push({
+      issue: '内存使用率过高',
+      suggestion: '配置 PM2 max_memory_restart: 1G，或使用 clinic.js 分析内存泄漏'
+    });
+  }
+  if (health.cpu.percent > 80) {
+    issues.push({
+      issue: 'CPU 使用率过高',
+      suggestion: '检查是否有死循环、大量计算或未优化的查询'
+    });
+  }
+  if (health.processes.pm2 && health.processes.pm2.restarts > 5) {
+    issues.push({
+      issue: '进程频繁重启',
+      suggestion: '查看 PM2 日志：pm2 logs openclaw，排查崩溃原因'
+    });
+  }
+  if (health.processes.pm2 && health.processes.pm2.status !== 'online') {
+    issues.push({
+      issue: '进程未运行',
+      suggestion: '立即执行：pm2 restart openclaw 或 systemctl restart openclaw'
+    });
   }
   
-  // PM2 检查
-  if (lowerQuery.includes('pm2') || lowerQuery.includes('进程') || lowerQuery.includes('守护')) {
-    const result = await checkPM2();
-    return `## 🔍 PM2 状态检查\n\n${JSON.stringify(result, null, 2)}`;
+  if (issues.length === 0) {
+    issues.push({
+      issue: '无问题',
+      suggestion: '系统运行正常'
+    });
   }
   
-  // systemd 检查
-  if (lowerQuery.includes('systemd') || lowerQuery.includes('服务')) {
-    const result = await checkSystemd();
-    return `## 🔍 systemd 服务状态\n\n${JSON.stringify(result, null, 2)}`;
-  }
-  
-  // WebSocket 检查
-  if (lowerQuery.includes('websocket') || lowerQuery.includes('连接') || lowerQuery.includes('断连')) {
-    const result = await checkWebSocket();
-    return `## 🔍 WebSocket 连接诊断\n\n${JSON.stringify(result, null, 2)}`;
-  }
-  
-  // 全面健康检查
-  if (lowerQuery.includes('健康') || lowerQuery.includes('health') || lowerQuery.includes('检查') || lowerQuery.includes('status')) {
-    const result = await healthCheck();
-    const suggestions = generateRepairSuggestions(result);
-    return `## 🏥 全面健康检查\n\n**整体状态：** ${result.status}\n**检查时间：** ${result.timestamp}\n\n### 详细结果\n${JSON.stringify(result.checks, null, 2)}\n\n### 修复建议\n${suggestions.map(s => `- ${s}`).join('\n\n')}`;
-  }
-  
-  // 生成优化配置
-  if (lowerQuery.includes('配置') || lowerQuery.includes('优化') || lowerQuery.includes('config')) {
-    const config = await generateOptimizedConfig();
-    return `## ⚙️ 优化配置模板\n\n\`\`\`json\n${config}\n\`\`\``;
-  }
-  
-  // 默认回复
-  return `## 🛠️ OpenClaw 双机互修助手\n\n我可以帮你：\n\n1. **内存监控** - 检查内存使用和泄漏\n2. **进程守护** - 检查 PM2/systemd 状态\n3. **连接诊断** - WebSocket 断连分析\n4. **健康检查** - 全面系统诊断\n5. **配置优化** - 生成最佳实践配置\n\n请告诉我需要检查什么？例如：\n- "检查内存使用情况"\n- "PM2 状态正常吗？"\n- "帮我做全面健康检查"\n- "生成优化配置"`;
+  return issues;
 }
