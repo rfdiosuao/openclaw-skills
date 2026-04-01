@@ -1,0 +1,33 @@
+# 依赖
+node_modules/
+package-lock.json
+
+# 临时文件
+/tmp/
+*.tmp
+
+# 生成的图片
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+!tests/fixtures/
+
+# 日志
+*.log
+logs/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 环境变量
+.env
+.env.local
