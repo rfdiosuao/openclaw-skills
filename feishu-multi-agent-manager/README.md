@@ -3,7 +3,7 @@
 > **交互式引导版本** - 逐步指导用户创建多个飞书 Bot，配置多 Agent 系统
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/rfdiosuao/openclaw-skills)
+[![Version](https://img.shields.io/badge/version-2.0.4-blue.svg)](https://github.com/rfdiosuao/openclaw-skills)
 
 ---
 
@@ -25,27 +25,37 @@ npm run build
 
 ## 🚀 功能特性
 
-### ✨ v2.0 新增功能
+### ✨ v2.0.4 新增功能（兼容飞书插件 2026.4.1）
 
-1. **交互式配置向导** 🎯
+1. **兼容飞书插件 2026.4.1** 🦞
+   - 适配 OpenClaw 2026.3.31+
+   - 支持话题模式独立上下文
+   - 支持流式输出配置
+
+2. **交互式配置向导** 🎯
    - 逐步引导用户完成配置
    - 询问用户要创建几个 Agent
    - 提供预设角色推荐方案
 
-2. **飞书 Bot 创建教程** 📘
+3. **飞书 Bot 创建教程** 📘
    - 详细的图文教程
    - 分步骤指导创建飞书应用
    - 包含检查清单和注意事项
 
-3. **批量创建支持** 📦
+4. **批量创建支持** 📦
    - 一次性创建多个 Agent
    - 自动验证每个凭证
    - 详细的成功/失败报告
 
-4. **预设角色模板** 🎭
+5. **预设角色模板** 🎭
    - 6 个经典角色（大总管、开发、内容、运营、法务、财务）
    - 每个角色包含完整人设文件
    - 支持完全自定义
+
+6. **诊断命令集成** 🔧
+   - `/feishu start` - 检查插件状态
+   - `/feishu doctor` - 深度诊断
+   - `/feishu auth` - 批量授权
 
 ---
 
@@ -603,6 +613,24 @@ curl -X POST "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/inter
 
 ## 📝 更新日志
 
+### v2.0.4 (2026-04-01) - 兼容飞书插件 2026.4.1
+- ✅ **兼容飞书插件 2026.4.1** - 适配 OpenClaw 2026.3.31+
+- ✅ **支持话题模式** - 集成 `threadSession` 配置
+- ✅ **支持流式输出** - 集成 `streaming` 配置
+- ✅ **诊断命令** - 集成 `/feishu start/doctor/auth`
+- ✅ **更新安装说明** - 使用最新官方安装命令
+
+### v2.0.2 (2026-03-26) - 动态路径 + 自动备份
+- ✅ **动态路径获取** - 自动检测用户实际路径
+- ✅ **配置前自动备份** - 修改 openclaw.json 前自动备份
+- ✅ **自动复制认证配置** - 创建子 Agent 时自动复制 auth-profiles.json
+- ✅ **配置验证** - 添加配置格式验证和错误提示
+
+### v2.0.1 (2026-03-19) - 配置格式修复
+- 🐛 **修复 accounts 配置格式** - 数组→对象格式
+- ✅ **自动检测和转换** - 数组格式自动转换为对象格式
+- ✅ **配置格式验证** - 添加初始化保护
+
 ### v2.0.0 (2026-03-09)
 - ✨ **交互式配置向导** - 逐步引导用户完成配置
 - ✨ **飞书创建教程** - 详细的图文教程
@@ -651,7 +679,7 @@ MIT License
 ---
 
 **维护者：** [@rfdiosuao](https://github.com/rfdiosuao)  
-**最后更新：** 2026-03-09
+**最后更新：** 2026-04-01
 
 ---
 

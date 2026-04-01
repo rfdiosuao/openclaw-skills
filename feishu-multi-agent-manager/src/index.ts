@@ -574,6 +574,8 @@ export async function main(ctx: SessionContext, args: Record<string, any>): Prom
         // 启动配置向导
         await ctx.reply(`🤖 **欢迎使用飞书多 Agent 配置助手！**
 
+> 💡 **兼容飞书插件 2026.4.1** | OpenClaw ≥ 2026.3.31
+
 我将引导你完成多个 Agent 的配置流程。
 
 ## 📋 配置流程
@@ -609,7 +611,17 @@ export async function main(ctx: SessionContext, args: Record<string, any>): Prom
 - \`6 个\` - 完整团队：全部 6 个角色
 - \`自定义\` - 你自由选择角色
 
-回复数字或"自定义"，我们开始吧！ 😊`);
+回复数字或"自定义"，我们开始吧！ 😊
+
+---
+
+## 📦 前置检查
+
+确保已安装：
+- ✅ OpenClaw ≥ 2026.3.31
+- ✅ 飞书官方插件 2026.4.1（\`npx -y @larksuite/openclaw-lark install\`）
+
+**检查命令：** \`/feishu start\``);
         break;
       }
       
@@ -739,9 +751,38 @@ openclaw restart
 ### 3. 测试 Bot
 在飞书中搜索 Bot 名称，发送消息测试
 
-### 4. 查看日志
+### 4. 批量授权（重要）
+在飞书对话中发送：
+\`\`\`
+/feishu auth
+\`\`\`
+
+完成用户授权，使 Agent 能访问你的飞书文档、日历等
+
+### 5. 查看日志
 \`\`\`bash
 tail -f /home/node/.openclaw/run.log
+\`\`\`
+
+---
+
+## 🚀 高级配置（可选）
+
+### 开启流式输出
+\`\`\`bash
+openclaw config set channels.feishu.streaming true
+\`\`\`
+
+### 开启话题模式（独立上下文）
+\`\`\`bash
+openclaw config set channels.feishu.threadSession true
+\`\`\`
+
+### 诊断命令
+\`\`\`
+/feishu start   # 检查插件状态
+/feishu doctor  # 深度诊断
+/feishu auth    # 批量授权
 \`\`\`
 
 ---
@@ -750,12 +791,14 @@ tail -f /home/node/.openclaw/run.log
 
 所有 Agent 的配置已保存到：
 - **配置文件：** \`/home/node/.openclaw/openclaw.json\`
-- **工作区：** \`/home/node/.openclaw/workspace/[agentId]/\`
+- **工作区：** \`/home/node/.openclaw/workspace-[agentId]/\`
 - **人设文件：** 每个工作区包含 SOUL.md、AGENTS.md、USER.md
 
 ---
 
-💡 **提示：** 如果有任何 Bot 显示 offline，请检查飞书应用配置是否正确（凭证、事件订阅、权限）。
+💡 **提示：** 
+- 如果有任何 Bot 显示 offline，请检查飞书应用配置（凭证、事件订阅、权限）
+- 飞书插件版本：2026.4.1 | OpenClaw 版本：≥ 2026.3.31
 
 需要帮助请回复 \`帮助\` 或 \`排查\`！`);
         } else {

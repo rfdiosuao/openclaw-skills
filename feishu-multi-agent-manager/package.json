@@ -1,6 +1,6 @@
 {
   "name": "feishu-multi-agent-manager",
-  "version": "2.0.1",
+  "version": "2.0.4",
   "description": "飞书多 Agent 管理器 - 支持主 Agent 自主创建子 Agent，用户可在 UI 界面直接配置多个飞书 Bot 凭证",
   "author": "郑宇航",
   "license": "MIT",

@@ -1,14 +1,15 @@
 {
   "name": "feishu-multi-agent-manager",
-  "version": "2.0.1",
-  "description": "飞书多 Agent 配置助手 - 交互式引导，逐步指导用户创建多个飞书 Bot，配置多 Agent 系统",
+  "version": "2.0.4",
+  "description": "飞书多 Agent 配置助手 - 交互式引导，逐步指导用户创建多个飞书 Bot，配置多 Agent 系统（兼容飞书插件 2026.4.1）",
   "author": "rfdiosuao",
   "repository": "https://github.com/rfdiosuao/openclaw-skills",
   "license": "MIT",
   "tags": ["feishu", "multi-agent", "agent-management", "routing"],
   "category": "Agent 管理",
   "compatibility": {
-    "minOpenClawVersion": "1.0.0"
+    "minOpenClawVersion": "2026.3.31",
+    "feishuPlugin": "2026.4.1"
   },
   "main": "dist/index.js",
   "scripts": {
