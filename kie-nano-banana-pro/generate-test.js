@@ -64,14 +64,18 @@ async function waitForCompletion(taskId, timeout = 120000) {
     await new Promise(r => setTimeout(r, interval));
 
     const status = await getTaskStatus(taskId);
-    console.log('⏳ 任务状态:', status.status || status.taskStatus || 'unknown');
+    console.log('⏳ 任务状态:', status.state || status.status || 'unknown');
+    console.log('   完整响应:', JSON.stringify(status).substring(0, 200));
 
-    if (status.status === 'completed' || status.taskStatus === 'completed') {
+    // Kie AI 返回格式：state 字段 (success/failed/processing)
+    const taskState = status.state || status.status;
+    
+    if (taskState === 'success' || taskState === 'completed') {
       return status;
     }
 
-    if (status.status === 'failed' || status.taskStatus === 'failed') {
-      throw new Error(status.error || 'Task failed');
+    if (taskState === 'failed' || taskState === 'error') {
+      throw new Error(status.failMsg || status.error || 'Task failed');
     }
   }
 
@@ -79,58 +83,36 @@ async function waitForCompletion(taskId, timeout = 120000) {
 }
 
 /**
- * 查询状态 - 尝试多个可能的接口路径
+ * 查询状态
+ * 接口：GET /api/v1/jobs/recordInfo?taskId={taskId}
  */
 function getTaskStatus(taskId) {
   return new Promise((resolve, reject) => {
-    // 尝试不同的 API 路径
-    const paths = [
-      `/api/v1/jobs/${taskId}`,
-      `/api/v1/tasks/${taskId}`,
-      `/api/v1/image-jobs/${taskId}`,
-    ];
+    const options = {
+      hostname: BASE_URL,
+      port: 443,
+      path: `/api/v1/jobs/recordInfo?taskId=${taskId}`,
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+      },
+    };
 
-    let tried = 0;
-
-    function tryNext() {
-      if (tried >= paths.length) {
-        resolve({ status: 'processing', message: 'Still processing, please wait' });
-        return;
-      }
-
-      const path = paths[tried++];
-      const options = {
-        hostname: BASE_URL,
-        port: 443,
-        path: path,
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-        },
-      };
-
-      const req = https.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => data += chunk);
-        res.on('end', () => {
-          try {
-            const result = JSON.parse(data);
-            if (result.code === 200 || result.status !== 404) {
-              resolve(result.data || result);
-            } else {
-              tryNext();
-            }
-          } catch (e) {
-            tryNext();
-          }
-        });
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          const result = JSON.parse(data);
+          resolve(result.data || result);
+        } catch (e) {
+          reject(new Error(`Parse failed: ${e.message}`));
+        }
       });
+    });
 
-      req.on('error', () => tryNext());
-      req.end();
-    }
-
-    tryNext();
+    req.on('error', reject);
+    req.end();
   });
 }
 
@@ -166,7 +148,21 @@ async function main() {
     console.log('\n=====================================\n');
     console.log('✅ 图像生成完成!\n');
 
-    console.log('📊 完整响应:');
+    // 解析结果
+    const resultJson = finalStatus.resultJson ? JSON.parse(finalStatus.resultJson) : null;
+    console.log('📊 任务信息:');
+    console.log('- Task ID:', finalStatus.taskId);
+    console.log('- 状态:', finalStatus.state || finalStatus.status);
+    console.log('- 耗时:', finalStatus.costTime, 'ms');
+    console.log('- 完成时间:', new Date(finalStatus.completeTime).toLocaleString());
+    
+    if (resultJson && resultJson.resultUrls) {
+      console.log('\n🖼️ 生成结果:');
+      console.log('- 图像 URL:', resultJson.resultUrls[0]);
+    }
+    
+    console.log('\n=====================================\n');
+    console.log('📋 完整响应:');
     console.log(JSON.stringify(finalStatus, null, 2));
 
   } catch (error) {

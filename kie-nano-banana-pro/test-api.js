@@ -66,13 +66,14 @@ function createTask(params) {
 
 /**
  * 查询任务状态
+ * 接口：GET /api/v1/jobs/recordInfo?taskId={taskId}
  */
 function getTaskStatus(taskId) {
   return new Promise((resolve, reject) => {
     const options = {
       hostname: 'api.kie.ai',
       port: 443,
-      path: `/api/v1/jobs/${taskId}`,
+      path: `/api/v1/jobs/recordInfo?taskId=${taskId}`,
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${API_KEY}`,

@@ -97,9 +97,10 @@ export class KieNanoBananaPro {
 
   /**
    * 查询任务状态
+   * 接口：GET /api/v1/jobs/recordInfo?taskId={taskId}
    */
   async getTaskStatus(taskId: string): Promise<TaskStatusResponse> {
-    const response = await fetch(`${this.config.baseUrl}/api/v1/jobs/${taskId}`, {
+    const response = await fetch(`${this.config.baseUrl}/api/v1/jobs/recordInfo?taskId=${taskId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${this.config.apiKey}`,
