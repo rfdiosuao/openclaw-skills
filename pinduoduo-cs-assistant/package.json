@@ -1,6 +1,6 @@
 {
   "name": "pinduoduo-cs-assistant",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "拼多多商家客服自动化助手 - 浏览器自动登录、智能消息回复、售后处理",
   "main": "dist/index.js",
   "scripts": {

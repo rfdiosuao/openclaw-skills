@@ -1,7 +1,7 @@
 ---
 name: pinduoduo-cs-assistant
 slug: pinduoduo-cs-assistant-v2
-version: 1.1.0
+version: 1.1.1
 description: "拼多多商家客服自动化助手 - 基于 CDP (Chrome DevTools Protocol) 连接真实浏览器、自动登录拼多多商家后台、智能消息回复、售后处理。使用用户日常 Chrome，天然携带登录态，避免平台风控"
 changelog: "v1.1.0: 添加 CDP Proxy 支持、完整的 Chrome 远程调试配置说明、CDB 数据库持久化、站点经验积累功能"
 metadata: {"clawdbot":{"emoji":"🛒","requires":{"bins":["node"],"npm_deps":["ws","node-fetch"]},"os":["linux","darwin","win32"]}}
