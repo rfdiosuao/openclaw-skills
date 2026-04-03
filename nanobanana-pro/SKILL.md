@@ -1,6 +1,6 @@
-# NanobananaPro 生图 Skill
+# NanobananaPro 生图大师 Skill
 
-> 版本：v1.0 | 作者：Spark | 创建时间：2026-04-03
+> 版本：v1.1 | 作者：Spark | 创建时间：2026-04-03 | 更新：整合 AI 视频知识库实战案例
 
 ---
 
@@ -9,6 +9,13 @@
 **NanobananaPro 官方认证首席生图提示词大师** —— 专精于 NanobananaPro 平台的极致生图提示词生成系统
 
 **核心使命：** 生成 100% 适配 NanobananaPro 平台、可直接复制粘贴落地、零废稿、零修改、零翻车的极致专业生图提示词
+
+**核心差异化：**
+- ✅ 基于 300+ 电影风格提示词库
+- ✅ 整合 5000+ 分镜画面提示词
+- ✅ 标准化 10 列分镜表格模板
+- ✅ 完整镜头语言体系（10 种基础 +6 种进阶）
+- ✅ 实战案例库（年兽/剑来/武松打虎/凡人逆天伐仙）
 
 ---
 
@@ -138,6 +145,11 @@ ugly, deformed, blurry, noisy, [针对性负面词]
 ### 1. 首尾帧强关联法则
 首尾帧必须保留 90% 以上固定元素，仅保留 1 个核心变量
 
+**参考图使用策略：**
+- 单镜头（5-10 秒）：2 张参考图（首帧 + 尾帧）
+- 多镜头（15 秒）：4-6 张参考图（每镜头 1-2 张）
+- 复杂剧情（30 秒+）：8-12 张参考图（角色 + 场景 + 关键帧）
+
 ### 2. 固定锚点元素锁死
 在所有首尾帧中加入全程固定不动的锚点元素（如背景建筑、道具、装饰）
 
@@ -152,6 +164,28 @@ ugly, deformed, blurry, noisy, [针对性负面词]
 - 光源方向（顺光/侧光/逆光/顶光）
 - 光源强度（低/中/高）
 - 色温数值（2000K-10000K）
+
+### 6. 提示词标准结构
+```
+【景别】+【视角】+【画面内容：人物 + 行为 + 环境】+【画面美学】
+
+景别：远景→全景→中景→近景→特写→大特写→极端特写
+视角：正面平视/侧面/背面/俯视/仰视/四分之三侧/水下/航拍
+```
+
+### 7. 视频分镜模板
+```
+【镜头编号】时间段
+画面内容：详细描述
+镜头运动：专业术语
+禁止出现：负面约束
+```
+
+### 8. 情绪递进设计（4 段式）
+- 段 1（开场）：压抑/平静 → 建立基调
+- 段 2（发展）：紧张/不安 → 情绪递进
+- 段 3（高潮）：对抗/激烈 → 情绪顶点
+- 段 4（结局）：喜悦/祥和 → 情绪释放
 
 ---
 
@@ -186,14 +220,27 @@ ugly, deformed, blurry, noisy, [针对性负面词]
 
 本 Skill 依赖以下知识库文件（按需加载）：
 
-- `references/style-library.md` - 50+ 大师级风格库
-- `references/prompt-templates.md` - 分场景提示词模板
-- `references/negative-prompts.md` - 负面提示词库
-- `references/composition-guide.md` - 构图法则手册
-- `references/lighting-guide.md` - 光影系统手册
-- `references/color-theory.md` - 色彩理论手册
-- `references/camera-lens-guide.md` - 相机/镜头参数手册
+### 核心知识库
+- `references/style-library.md` - 50+ 大师级风格库（含 3D 国漫玄幻/古典名著）
+- `references/prompt-templates.md` - 分场景提示词模板（15+ 场景）
+- `references/negative-prompts.md` - 7 类负面提示词库
 - `references/platform-specs.md` - NanobananaPro 平台规格
+
+### 镜头与分镜
+- `references/camera-movement-guide.md` - 镜头语言完整体系（10 种基础 +6 种进阶）
+- `references/storyboard-template.md` - 10 列标准化分镜模板（年兽实战案例）
+
+### 美学手册
+- `references/composition-guide.md` - 构图法则手册（9 种经典构图）
+- `references/lighting-guide.md` - 光影系统手册（6 种基础光位 + 能量光效）
+- `references/color-theory.md` - 色彩理论手册（12 色环配色）
+- `references/camera-lens-guide.md` - 相机/镜头参数手册
+
+### 实战案例库
+- 年兽的由来（15 镜头，45 秒，古典神话）
+- 剑来（4 镜头，15 秒，3D 国漫）
+- 武松打虎（多片段，古典名著）
+- 凡人逆天伐仙（5 分镜，仙侠风格）
 
 ---
 
