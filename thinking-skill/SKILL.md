@@ -14,12 +14,27 @@
 
 ## ⚡ 触发规则
 
-### 主触发词
-- `/thinking` - 标准触发
-- `先思考一下` - 中文触发
-- `think about this` - 英文触发
-- `规划一下` - 规划触发
-- `分析一下` - 分析触发
+### 两步触发机制
+
+**Step 1：标记思考模式**
+```
+/thinking
+```
+→ Agent 进入思考准备状态，回复："🤔 已进入思考模式，请描述您要处理的任务"
+
+**Step 2：描述任务**
+```
+帮我分析一下最近的股票走势，然后生成一份报告发到飞书群里
+```
+→ Agent 开始完整的思考流程并执行
+
+### 触发词说明
+
+| 触发词 | 作用 | 示例 |
+|--------|------|------|
+| `/thinking` | 进入思考模式（下一步才触发） | `/thinking` → 等待下一条消息 |
+| `先思考一下` | 直接进入思考流程 | `先思考一下这个问题` |
+| `think about this` | 直接进入思考流程 | `think about this task` |
 
 ### 场景触发
 - 复杂任务（多步骤、需要协调多个技能）
@@ -242,6 +257,79 @@
 
 ## 🔧 技术实现
 
+### 思考模式状态管理
+
+**状态存储：**
+```typescript
+interface ThinkingState {
+  isActive: boolean;        // 是否处于思考模式
+  activatedAt: number;      // 激活时间戳
+  timeoutMs: number;        // 超时时间（默认 5 分钟）
+  lastMessage?: string;     // 上一条消息（用于检测是否取消）
+}
+```
+
+**状态流转：**
+```
+正常模式 --/thinking--> 思考准备模式 --用户输入任务--> 思考执行模式 --完成--> 正常模式
+思考准备模式 --用户取消--> 正常模式
+思考准备模式 --超时（5 分钟）--> 自动退出
+```
+
+**实现逻辑：**
+```typescript
+// 检查是否处于思考模式
+function isThinkingMode(): boolean {
+  const state = loadThinkingState();
+  if (!state) return false;
+  
+  // 检查是否超时
+  if (Date.now() - state.activatedAt > state.timeoutMs) {
+    clearThinkingState();
+    return false;
+  }
+  
+  return state.isActive;
+}
+
+// 进入思考模式
+function enterThinkingMode() {
+  saveThinkingState({
+    isActive: true,
+    activatedAt: Date.now(),
+    timeoutMs: 5 * 60 * 1000, // 5 分钟
+  });
+  
+  return '🤔 已进入思考模式，请描述您要处理的任务';
+}
+
+// 处理思考模式下的消息
+async function handleThinkingMessage(userMessage: string): Promise<string> {
+  // 检测是否是取消指令
+  if (isCancelMessage(userMessage)) {
+    clearThinkingState();
+    return '✅ 已取消思考模式，如有需要随时输入 /thinking';
+  }
+  
+  // 开始完整思考流程
+  const thinkingResult = await runThinkingProcess(userMessage);
+  clearThinkingState();
+  
+  // 输出思考结果并开始执行
+  return formatThinkingOutput(thinkingResult);
+}
+
+// 检测取消指令
+function isCancelMessage(message: string): boolean {
+  const cancelKeywords = ['算了', '不用了', '取消', 'cancel', 'never mind'];
+  return cancelKeywords.some(keyword => 
+    message.toLowerCase().includes(keyword)
+  );
+}
+```
+
+---
+
 ### 记忆检索接口
 
 ```typescript
@@ -300,11 +388,21 @@ async function thinkingProcess(userTask: string): Promise<ThinkingResult> {
 
 ## 💡 使用示例
 
-### 示例 1：复杂任务
+### 示例 1：两步触发（推荐）
 
-**用户输入：**
+**Step 1：标记思考模式**
 ```
-/thinking 帮我分析一下最近的股票走势，然后生成一份报告发到飞书群里
+/thinking
+```
+
+**Agent 回复：**
+```
+🤔 已进入思考模式，请描述您要处理的任务
+```
+
+**Step 2：描述任务**
+```
+帮我分析一下最近的股票走势，然后生成一份报告发到飞书群里
 ```
 
 **Thinking 输出：**
@@ -419,11 +517,44 @@ async function thinkingProcess(userTask: string): Promise<ThinkingResult> {
 
 ---
 
-### 示例 2：技能开发
+### 示例 2：直接进入思考流程
 
 **用户输入：**
 ```
-/thinking 我想开发一个新的 Skill，可以自动回复飞书群里的@消息
+先思考一下，我想开发一个新的 Skill，可以自动回复飞书群里的@消息
+```
+
+**Thinking 输出：**
+```markdown
+# 🤔 Thinking Process
+
+## 📋 任务解析
+[任务分析结果]
+...
+```
+
+---
+
+### 示例 3：取消思考模式
+
+**用户输入：**
+```
+/thinking
+```
+
+**Agent 回复：**
+```
+🤔 已进入思考模式，请描述您要处理的任务
+```
+
+**用户改变主意：**
+```
+算了，不用了
+```
+
+**Agent 回复：**
+```
+✅ 已取消思考模式，如有需要随时输入 /thinking
 ```
 
 **Thinking 输出：**
