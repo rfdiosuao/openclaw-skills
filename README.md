@@ -1,356 +1,206 @@
-# OpenClaw 双机互修助手
+# OpenClaw Skills
 
-> 让两只 OpenClaw 互相守护，实现 7×24 小时稳定运行
+> 🤖 OpenClaw Skill 开发专家 - 专注 Skill 创造与 ClawHub 云端分发
 
-## 📖 目录
-
-- [功能介绍](#-功能介绍)
-- [快速开始](#-快速开始)
-- [配置说明](#-配置说明)
-- [使用示例](#-使用示例)
-- [工作原理](#-工作原理)
-- [故障排查](#-故障排查)
-- [开发指南](#-开发指南)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-12-blue.svg)](https://clawhub.ai/skills)
 
 ---
 
-## 🎯 功能介绍
+## 📚 已发布 Skills
 
-**OpenClaw 双机互修助手** 是一个高可用性运维 Skill，支持两台 OpenClaw 实例互相监控、诊断和修复。
+| Skill 名称 | 版本 | 说明 | 安装命令 |
+|------------|------|------|----------|
+| **nanobanana-pro-prompt-master** | 1.1.0 | NanobananaPro 生图大师 - 专业级 AI 生图提示词生成系统 | `clawhub install nanobanana-pro-prompt-master` |
+| feishu-new-chat | 1.0.0 | 飞书快捷发起新对话 | `clawhub install feishu-new-chat` |
+| care-taker | 1.0.0 | 智能关怀助手 | `clawhub install care-taker` |
+| feishu-multi-agent-manager | 1.0.0 | 飞书多 Agent 配置助手 | `clawhub install feishu-multi-agent-manager` |
+| feishu-ai-coding-assistant | 1.0.0 | AI 编程助手 | `clawhub install feishu-ai-coding-assistant` |
+| openclaw-security-guard | 1.0.0 | 安全审计助手 | `clawhub install openclaw-security-guard` |
+| video-summarizer | 1.0.0 | 视频文案总结 | `clawhub install video-summarizer` |
+| file-persistence-writer | 1.0.0 | 持久化文件写入 | `clawhub install file-persistence-writer` |
+| openclaw-mutual-repair | 1.0.0 | 双 Agent 互修 | `clawhub install openclaw-mutual-repair` |
+| web-reverse-debugger | 1.0.0 | 网页逆向调试 | `clawhub install web-reverse-debugger` |
 
-### 核心价值
+---
 
-- **互相监控** - 双机实时监测对方健康状态
-- **自动诊断** - 智能识别内存泄漏、进程崩溃等问题
-- **修复建议** - 提供专业的修复方案
-- **7×24 稳定** - 实现生产环境高可用部署
+## 🎯 核心能力
 
-### 适用场景
+### 飞书集成
+- 飞书新对话发起
+- 飞书多 Agent 管理
+- 飞书任务/日历/文档集成
 
-- 生产环境双机部署
-- 需要高可用性的场景
-- 希望减少人工运维干预
+### AI 生图/视频
+- **NanobananaPro 生图大师** - 专业级 AI 生图提示词生成
+  - 50+ 大师级风格库
+  - 10 种基础运镜 +6 种进阶组合
+  - 10 列标准化分镜模板
+  - 实战案例库（年兽/剑来/武松打虎）
+
+### 运维工具
+- 双机互修助手
+- 安全审计助手
+- 文件持久化写入
+
+### 开发工具
+- AI 编程助手
+- 网页逆向调试
+- 视频文案总结
 
 ---
 
 ## 🚀 快速开始
 
-### 1. 安装 Skill
+### 1. 安装 ClawHub CLI
 
 ```bash
-clawhub install openclaw-mutual-repair
+npm install -g @openclaw/cli
 ```
 
-### 2. 配置双机环境
+### 2. 登录 ClawHub
 
-**机器 A (192.168.1.100) 配置：**
-```json
-{
-  "openclaw-mutual-repair": {
-    "localHost": "0.0.0.0",
-    "localPort": 9528,
-    "remoteHost": "192.168.1.101",
-    "remotePort": 9528,
-    "heartbeatInterval": 300000,
-    "heartbeatTimeout": 30000,
-    "memoryThreshold": 85,
-    "cpuThreshold": 80
-  }
-}
-```
-
-**机器 B (192.168.1.101) 配置：**
-```json
-{
-  "openclaw-mutual-repair": {
-    "localHost": "0.0.0.0",
-    "localPort": 9528,
-    "remoteHost": "192.168.1.100",
-    "remotePort": 9528,
-    "heartbeatInterval": 300000,
-    "heartbeatTimeout": 30000,
-    "memoryThreshold": 85,
-    "cpuThreshold": 80
-  }
-}
-```
-
-### 3. 启动服务
-
-在飞书或 OpenClaw 聊天中输入：
-```
-启动互修
-```
-
-### 4. 验证状态
-
-```
-健康检查
-```
-
----
-
-## ⚙️ 配置说明
-
-### 必填配置
-
-| 参数 | 说明 | 示例 |
-|------|------|------|
-| `remoteHost` | 对端主机 IP 地址 | `192.168.1.101` |
-| `remotePort` | 对端监听端口 | `9528` |
-
-### 可选配置
-
-| 参数 | 默认值 | 说明 |
-|------|--------|------|
-| `localHost` | `0.0.0.0` | 本机监听地址 |
-| `localPort` | `9528` | 本机监听端口 |
-| `heartbeatInterval` | `300000` | 心跳间隔（毫秒），默认 5 分钟 |
-| `heartbeatTimeout` | `30000` | 心跳超时（毫秒），默认 30 秒 |
-| `memoryThreshold` | `85` | 内存告警阈值（%） |
-| `cpuThreshold` | `80` | CPU 告警阈值（%） |
-
----
-
-## 💬 使用示例
-
-### 启动服务
-```
-启动互修
-```
-输出：
-```
-## ✅ 双机互修服务已启动
-
-**本机：** 0.0.0.0:9528
-**对端：** 192.168.1.101:9528
-**心跳间隔：** 300 秒
-
-服务正在后台运行，自动监控对端健康状态。
-```
-
-### 健康检查
-```
-健康检查
-```
-输出：
-```
-## 🏥 健康检查结果
-
-**整体状态：** ✅ OK
-
-### 资源使用
-- **内存：** 65% (1024MB / 2048MB)
-- **CPU：** 25%
-- **运行时间：** 12 小时 30 分钟
-
-### 进程状态
-- **PM2 状态：** online
-- **进程内存：** 450MB
-- **重启次数：** 2
-
-### 建议
-- ✅ 一切正常，无需干预
-```
-
-### 诊断问题
-```
-诊断
-```
-输出：
-```
-## 🔍 诊断报告
-
-- **内存使用率过高**
-  - 建议：配置 PM2 max_memory_restart: 1G，或使用 clinic.js 分析内存泄漏
-- **进程重启频繁**
-  - 建议：查看 PM2 日志：pm2 logs openclaw，排查崩溃原因
-```
-
-### 停止服务
-```
-停止互修
-```
-
----
-
-## 🔬 工作原理
-
-### 心跳协议
-
-```
-机器 A (192.168.1.100)          机器 B (192.168.1.101)
-       │                              │
-       ├──── 定期发送心跳 ────────────►│
-       │    (每 5 分钟)                  │
-       │    {                          │
-       │      status: "ok",            │
-       │      memory: 65,              │
-       │      cpu: 25,                 │
-       │      uptime: 45000            │
-       │    }                          │
-       │                              │
-       │◄──── 返回确认 ───────────────┤
-       │    { status: "ok" }          │
-       │                              │
-```
-
-### 故障检测流程
-
-1. **心跳超时检测** - 超过 2 个间隔未收到心跳
-2. **健康状态检查** - 分析对端上报的健康数据
-3. **告警触发** - 发现异常状态（内存/CPU 超标、进程崩溃）
-4. **诊断执行** - 尝试远程诊断（ping、端口检测）
-5. **修复建议** - 发送修复方案或执行远程修复
-
-### HTTP API
-
-双机通信使用 HTTP REST API：
-
-| 端点 | 方法 | 说明 |
-|------|------|------|
-| `/api/heartbeat` | POST | 发送心跳 |
-| `/api/repair` | POST | 请求修复 |
-
----
-
-## 🐛 故障排查
-
-### 问题 1：心跳发送失败
-
-**错误：**
-```
-[Heartbeat] Failed to send: connect ECONNREFUSED
-```
-
-**原因：** 对端服务未启动或防火墙阻止
-
-**解决：**
-1. 检查对端 OpenClaw 是否运行
-2. 检查防火墙是否开放端口：`sudo ufw allow 9528`
-3. 测试连通性：`telnet 192.168.1.101 9528`
-
-### 问题 2：端口被占用
-
-**错误：**
-```
-Error: listen EADDRINUSE: address already in use :::9528
-```
-
-**原因：** 端口已被其他进程占用
-
-**解决：**
-1. 查找占用进程：`lsof -i :9528`
-2. 停止占用进程或修改配置中的 `localPort`
-
-### 问题 3：PM2 检测失败
-
-**输出：**
-```
-PM2 未检测到 OpenClaw 进程
-```
-
-**原因：** 未使用 PM2 启动 OpenClaw
-
-**解决：**
 ```bash
-pm2 start app.js --name openclaw
-pm2 save
-pm2 startup
+claw login --token <your_token>
 ```
 
-### 问题 4：内存检测异常
+### 3. 安装 Skill
 
-**原因：** `free` 命令输出格式不同
+```bash
+clawhub install <skill-name>
+```
 
-**解决：** 检查系统类型，调整内存解析逻辑
+### 4. 查看已安装 Skills
+
+```bash
+claw skill list
+```
 
 ---
 
-## 🛠️ 开发指南
+## 📦 开发新 Skill
 
-### 项目结构
+### 克隆仓库
+
+```bash
+git clone https://github.com/rfdiosuao/openclaw-skills.git
+cd openclaw-skills
+```
+
+### 复制模板
+
+```bash
+cp -r skill-template my-new-skill
+```
+
+### 修改配置
+
+```bash
+cd my-new-skill
+# 编辑 SKILL.md, skill.json, package.json, src/index.ts
+```
+
+### 编译发布
+
+```bash
+npm install && npm run build
+claw skill publish
+```
+
+---
+
+## 📁 项目结构
 
 ```
-openclaw-mutual-repair/
+my-skill/
+├── SKILL.md                          # ClawHub 格式说明（核心指令）
+├── skill.json                        # Skill 元数据
+├── package.json                      # NPM 配置
+├── tsconfig.json                     # TypeScript 配置
+├── README.md                         # 完整文档
 ├── src/
-│   └── index.ts          # 核心实现
+│   └── index.ts                      # 主入口
 ├── tests/
-│   └── index.test.ts     # 单元测试
-├── skill.json            # Skill 配置
-├── package.json          # NPM 依赖
-├── tsconfig.json         # TypeScript 配置
-└── README.md             # 本文档
+│   └── index.test.ts                 # 单元测试
+├── references/                       # 知识库（可选）
+│   ├── style-library.md              # 风格库
+│   ├── prompt-templates.md           # 提示词模板
+│   └── negative-prompts.md           # 负面词库
+└── .gitignore
 ```
-
-### 本地开发
-
-```bash
-# 安装依赖
-npm install
-
-# 编译
-npm run build
-
-# 测试
-npm test
-```
-
-### 添加新功能
-
-1. 在 `src/index.ts` 中添加功能
-2. 更新 `skill.json` 的 triggers
-3. 编写测试用例
-4. 更新文档
 
 ---
 
-## 📊 监控指标
+## 📊 开发指标
 
-### 系统资源
-
-| 指标 | 正常值 | 告警 | 严重 |
-|------|--------|------|------|
-| 内存使用率 | < 70% | > 85% | > 95% |
-| CPU 使用率 | < 50% | > 80% | > 95% |
-| 磁盘使用率 | < 70% | > 85% | > 95% |
-
-### 应用状态
-
-| 指标 | 正常值 | 告警 | 严重 |
-|------|--------|------|------|
-| PM2 状态 | online | stopped | errored |
-| 重启次数 | 0 | > 3 | > 10 |
-| 运行时间 | - | < 1h | < 10min |
-
-### 网络连接
-
-| 指标 | 正常值 | 告警 | 严重 |
-|------|--------|------|------|
-| WebSocket 连接 | > 10 | < 5 | 0 |
-| 断连频率 | < 2/h | > 5/h | > 20/h |
-| 心跳延迟 | < 1s | > 5s | > 30s |
+| 指标 | 目标值 | 当前值 |
+|------|--------|--------|
+| 新增 Skills | 2-4 个/月 | 12 个 ✅ |
+| 发布成功率 | > 99% | 100% ✅ |
+| 测试覆盖率 | > 80% | 进行中 |
+| Issue 响应 | < 24h | 进行中 |
 
 ---
 
-## 🔐 安全建议
+## 🛠️ 常见问题
 
-1. **内网部署** - 仅在内部网络使用，不要暴露到公网
-2. **防火墙规则** - 限制心跳端口仅允许对端 IP 访问
-3. **SSH 安全** - 如启用远程修复，配置 SSH 密钥认证
-4. **日志审计** - 定期检查日志，发现异常访问
+### 问题 1：clawhub install 失败
+
+**检查项：**
+- 确认已登录 ClawHub：`claw whoami`
+- 检查网络连接
+- 验证 Skill 名称正确
+- 查看错误日志
+
+### 问题 2：配置飞书 Bot 时报错
+
+**错误：** `messageContains key 不存在`
+
+**原因：** 飞书插件版本与 OpenClaw 版本不匹配
+
+**解决方案：**
+1. 检查 OpenClaw 版本：`openclaw --version`
+2. 更新到最新版本：`npm update -g @openclaw/core`
+3. 使用 `textContains` 替代 `messageContains`
+
+### 问题 3：发布失败
+
+**错误：** `Slug is already taken`
+
+**解决方案：**
+- 修改 `skill.json` 中的 `name` 字段，使用唯一 slug
+- 例如：`nanobanana-pro` → `nanobanana-pro-prompt-master`
+
+---
+
+## 🔗 相关链接
+
+- [OpenClaw 官方文档](https://docs.openclaw.ai)
+- [ClawHub 市场](https://clawhub.ai/skills)
+- [Discord 社区](https://discord.com/invite/clawd)
+- [GitHub 仓库](https://github.com/rfdiosuao/openclaw-skills)
 
 ---
 
 ## 📝 更新日志
 
-### v1.0.0 (2026-03-27)
-- ✨ 初始版本发布
-- 🎯 实现双机心跳协议
-- 🏥 健康检查功能（内存、CPU、PM2）
-- 🔍 故障诊断功能
-- 🛠️ 远程修复功能（PM2/systemd）
-- 📚 完整文档
+### v1.1.0 (2026-04-03)
+- ✨ **NanobananaPro 生图大师 v1.1** - 整合 AI 视频知识库实战案例
+  - 新增镜头语言完整体系（10 种基础 +6 种进阶）
+  - 新增 10 列标准化分镜模板（年兽案例）
+  - 新增 3D 国漫玄幻/古典名著风格
+  - 整合 4 个实战案例（年兽/剑来/武松/凡人）
+
+### v1.0.0 (2026-04-03)
+- ✨ **NanobananaPro 生图大师 v1.0** - 初始版本发布
+  - 50+ 大师级风格库
+  - 15+ 场景提示词模板
+  - 7 类负面提示词库
+  - 完整平台规格说明
+
+### 2026-03-14
+- 📦 仓库初始化
+- 🎯 发布多个基础 Skills
 
 ---
 
@@ -358,7 +208,9 @@ npm test
 
 欢迎提交 Issue 和 PR！
 
-**GitHub:** https://github.com/rfdiosuao/openclaw-skills
+- **GitHub Issues:** https://github.com/rfdiosuao/openclaw-skills/issues
+- **Discord:** https://discord.com/invite/clawd
+- **ClawHub 论坛:** https://clawhub.ai/forum
 
 ---
 
@@ -368,5 +220,6 @@ MIT License
 
 ---
 
-**作者：** OpenClaw Skill Master  
-**维护者：** 郑宇航 (贺昂)
+**作者：** 郑宇航 (OpenClaw Skill Master)  
+**GitHub:** [@rfdiosuao](https://github.com/rfdiosuao)  
+**最后更新：** 2026-04-03
