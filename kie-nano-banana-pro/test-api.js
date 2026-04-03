@@ -151,15 +151,21 @@ async function runTest() {
         console.log('🔄 正在查询...');
         
         const status = await getTaskStatus(result.data.taskId);
-        console.log('任务状态:', status.data.status);
+        console.log('完整响应:', JSON.stringify(status, null, 2));
         
-        if (status.data.status === 'completed') {
+        // 兼容不同响应格式
+        const taskData = status.data || status.result || status;
+        const taskStatus = taskData.status || taskData.taskStatus;
+        
+        console.log('任务状态:', taskStatus);
+        
+        if (taskStatus === 'completed' || taskStatus === 'success') {
           console.log('✅ 图像生成完成!');
-          console.log('图像 URL:', status.data.imageUrl);
-        } else if (status.data.status === 'processing') {
+          console.log('图像 URL:', taskData.imageUrl || taskData.resultUrl || taskData.url);
+        } else if (taskStatus === 'processing' || taskStatus === 'running') {
           console.log('⏳ 任务仍在处理中...');
-        } else if (status.data.status === 'failed') {
-          console.log('❌ 任务失败:', status.data.error);
+        } else if (taskStatus === 'failed' || taskStatus === 'error') {
+          console.log('❌ 任务失败:', taskData.error || taskData.errorMessage);
         }
       } else {
         console.log('❌ API 返回错误:', result.msg);

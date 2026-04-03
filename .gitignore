@@ -4,6 +4,7 @@ dist/
 .DS_Store
 .env
 .env.local
+*.tar.gz
 coverage/
 *.tgz
 package-lock.json

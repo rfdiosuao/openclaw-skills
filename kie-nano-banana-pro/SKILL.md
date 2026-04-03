@@ -328,8 +328,19 @@ Landscape photography: [场景], [时间], [天气].
 
 - **官方文档：** https://docs.kie.ai/market/google/pro-image-to-image
 - **API Key 管理：** https://kie.ai/api-key
-- **任务状态查询：** https://docs.kie.ai/common-api/get-task-detail
 - **Webhook 验证：** https://docs.kie.ai/common-api/webhook-verification
+
+## ⚠️ 注意事项
+
+**任务状态查询：**
+- 推荐使用 `callBackUrl` 回调方式接收完成通知
+- 轮询查询接口路径需参考最新 API 文档
+- 创建任务接口已验证可用（返回 taskId）
+
+**测试验证：**
+- ✅ API Key 认证正常
+- ✅ 创建任务接口正常（返回 taskId）
+- ⏳ 状态查询接口需确认最新路径
 
 ---
 
