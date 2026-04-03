@@ -1,0 +1,12 @@
+node_modules
+dist
+*.pyc
+__pycache__
+*.log
+.DS_Store
+config.json
+venv
+*.mp4
+*.mp3
+*.srt
+*.wav

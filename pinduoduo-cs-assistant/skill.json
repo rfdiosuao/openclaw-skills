@@ -1,5 +1,5 @@
 {
-  "name": "pinduoduo-cs-assistant",
+  "name": "pinduoduo-cs-assistant-v2",
   "displayName": "拼多多客服助手",
   "version": "1.0.0",
   "description": "拼多多商家客服自动化助手 - 浏览器自动登录拼多多商家后台、智能读取买家消息、自动生成回复话术、快捷发送回复、售后订单处理",

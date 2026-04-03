@@ -1,6 +1,6 @@
 ---
 name: pinduoduo-cs-assistant
-slug: pinduoduo-cs-assistant
+slug: pinduoduo-cs-assistant-v2
 version: 1.0.0
 description: "拼多多商家客服自动化助手 - 浏览器自动登录拼多多商家后台、智能读取买家消息、自动生成回复话术、快捷发送回复、售后订单处理。基于 OpenClaw browser 工具实现 RPA 自动化，7x24 小时智能客服值守"
 changelog: "v1.0.0 初始版本：浏览器自动化登录、消息智能读取、话术库匹配、快捷回复发送、售后工单处理"
