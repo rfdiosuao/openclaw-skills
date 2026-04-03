@@ -1,0 +1,47 @@
+{
+  "name": "seedance-video-generator",
+  "displayName": "Seedance 2.0 视频生成",
+  "version": "1.0.0",
+  "description": "基于火山引擎 Doubao Seedance 2.0 模型的多模态视频生成工具，支持第一人称视角、参考图片/视频/音频输入",
+  "author": "郑宇航",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "generation",
+    "seedance",
+    "doubao",
+    "火山引擎",
+    "多模态",
+    "ai-video"
+  ],
+  "category": "media",
+  "main": "dist/index.js",
+  "commands": [
+    {
+      "name": "seedance-generate",
+      "description": "使用 Seedance 2.0 生成视频",
+      "handler": "generate"
+    }
+  ],
+  "config": {
+    "apiKey": {
+      "type": "string",
+      "required": true,
+      "description": "火山引擎 Ark API Key",
+      "env": "VOLCENGINE_ARK_API_KEY"
+    },
+    "baseUrl": {
+      "type": "string",
+      "required": false,
+      "default": "https://ark.cn-beijing.volces.com/api/v3",
+      "description": "API 基础 URL"
+    }
+  },
+  "capabilities": {
+    "multimodal": true,
+    "referenceImages": true,
+    "referenceVideo": true,
+    "referenceAudio": true,
+    "audioGeneration": true
+  }
+}
