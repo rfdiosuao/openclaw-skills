@@ -238,7 +238,7 @@ Authorization: Bearer YOUR_API_KEY
 }
 ```
 
-### 示例 3：生产环境回调
+### 示例 3：生产环境回调（推荐）
 
 **用户输入：**
 > 批量生成产品图，回调到 https://api.myshop.com/callback
@@ -255,6 +255,35 @@ Authorization: Bearer YOUR_API_KEY
     "output_format": "png"
   }
 }
+```
+
+**回调通知：**
+```json
+{
+  "taskId": "task_xxx",
+  "status": "completed",
+  "data": {
+    "imageUrl": "https://cdn.kie.ai/generated/xxx.png",
+    "thumbnailUrl": "https://cdn.kie.ai/thumbnails/xxx.png"
+  }
+}
+```
+
+---
+
+### 示例 4：测试回调（使用 Webhook.site）
+
+**步骤：**
+1. 访问 https://webhook.site 获取唯一 URL
+2. 使用该 URL 作为 callBackUrl
+3. 在 webhook.site 页面查看回调结果
+
+**代码示例：**
+```javascript
+const result = await kie.createTask({
+  prompt: "测试图片",
+  callBackUrl: "https://webhook.site/你的唯一 URL",
+});
 ```
 
 ---
