@@ -1,7 +1,7 @@
 {
   "name": "seedance-video-generator",
   "displayName": "Seedance 2.0 视频生成",
-  "slug": "rfd-seedance-video-gen",
+  "slug": "zheng-seedance-video-gen",
   "version": "1.0.0",
   "description": "基于火山引擎 Doubao Seedance 2.0 模型的多模态视频生成工具，支持第一人称视角、参考图片/视频/音频输入",
   "author": "郑宇航",
