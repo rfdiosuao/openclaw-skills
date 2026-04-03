@@ -11,6 +11,7 @@
 
 | Skill 名称 | 版本 | 说明 | 安装命令 |
 |------------|------|------|----------|
+| **kie-nano-banana-pro** | 1.0.0 | Kie AI Nano Banana Pro 生图 - Google 图像生成 API 集成 | `clawhub install kie-nano-banana-pro` |
 | **nanobanana-pro-prompt-master** | 1.1.0 | NanobananaPro 生图大师 - 专业级 AI 生图提示词生成系统 | `clawhub install nanobanana-pro-prompt-master` |
 | feishu-new-chat | 1.0.0 | 飞书快捷发起新对话 | `clawhub install feishu-new-chat` |
 | care-taker | 1.0.0 | 智能关怀助手 | `clawhub install care-taker` |
