@@ -1,7 +1,7 @@
 {
   "name": "seedance-movie-master",
   "displayName": "Seedance 2.0 电影级漫剧生成大师",
-  "slug": "seedance-movie-master-v1",
+  "slug": "seedance-film-master-20260403",
   "version": "1.0.0",
   "description": "融合好莱坞工业标准与 Seedance 2.0 专属多模态控制能力的电影级漫剧视频生成工具，支持全流程创作：故事规划、角色设定、分镜设计、6 阶提示词、视频生成",
   "author": "郑宇航",
