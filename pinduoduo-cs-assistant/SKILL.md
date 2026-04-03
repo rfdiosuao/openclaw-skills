@@ -1,10 +1,10 @@
 ---
 name: pinduoduo-cs-assistant
 slug: pinduoduo-cs-assistant-v2
-version: 1.0.0
-description: "拼多多商家客服自动化助手 - 浏览器自动登录拼多多商家后台、智能读取买家消息、自动生成回复话术、快捷发送回复、售后订单处理。基于 OpenClaw browser 工具实现 RPA 自动化，7x24 小时智能客服值守"
-changelog: "v1.0.0 初始版本：浏览器自动化登录、消息智能读取、话术库匹配、快捷回复发送、售后工单处理"
-metadata: {"clawdbot":{"emoji":"🛒","requires":{"bins":["node"],"npm_deps":["puppeteer"]},"os":["linux","darwin","win32"]}}
+version: 1.1.0
+description: "拼多多商家客服自动化助手 - 基于 CDP (Chrome DevTools Protocol) 连接真实浏览器、自动登录拼多多商家后台、智能消息回复、售后处理。使用用户日常 Chrome，天然携带登录态，避免平台风控"
+changelog: "v1.1.0: 添加 CDP Proxy 支持、完整的 Chrome 远程调试配置说明、CDB 数据库持久化、站点经验积累功能"
+metadata: {"clawdbot":{"emoji":"🛒","requires":{"bins":["node"],"npm_deps":["ws","node-fetch"]},"os":["linux","darwin","win32"]}}
 ---
 
 # 拼多多商家客服自动化助手
