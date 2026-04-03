@@ -1,0 +1,93 @@
+{
+  "name": "seedance-movie-master",
+  "displayName": "Seedance 2.0 电影级漫剧生成大师",
+  "slug": "seedance-movie-master-v1",
+  "version": "1.0.0",
+  "description": "融合好莱坞工业标准与 Seedance 2.0 专属多模态控制能力的电影级漫剧视频生成工具，支持全流程创作：故事规划、角色设定、分镜设计、6 阶提示词、视频生成",
+  "author": "郑宇航",
+  "license": "MIT",
+  "keywords": [
+    "video-generation",
+    "seedance",
+    "doubao",
+    "volcengine",
+    "电影级",
+    "漫剧",
+    "多模态",
+    "ai-video",
+    "storyboard",
+    "prompt-engineering"
+  ],
+  "category": "media",
+  "main": "dist/index.js",
+  "commands": [
+    {
+      "name": "seedance-story",
+      "description": "故事规划 - 生成三幕式结构大纲、人物设定、世界观",
+      "handler": "story"
+    },
+    {
+      "name": "seedance-character",
+      "description": "角色设定 - 创建角色 DNA 档案和参考图提示词",
+      "handler": "character"
+    },
+    {
+      "name": "seedance-storyboard",
+      "description": "分镜设计 - 生成分镜表格和镜头列表",
+      "handler": "storyboard"
+    },
+    {
+      "name": "seedance-prompt",
+      "description": "提示词生成 - 将镜头描述转换为 6 阶权重结构",
+      "handler": "prompt"
+    },
+    {
+      "name": "seedance-generate",
+      "description": "视频生成 - 使用 Seedance 2.0 生成视频",
+      "handler": "generate"
+    },
+    {
+      "name": "seedance-project",
+      "description": "完整项目 - 一键生成全套制作方案",
+      "handler": "project"
+    }
+  ],
+  "config": {
+    "apiKey": {
+      "type": "string",
+      "required": true,
+      "description": "火山引擎 Ark API Key",
+      "env": "VOLCENGINE_ARK_API_KEY"
+    },
+    "baseUrl": {
+      "type": "string",
+      "required": false,
+      "default": "https://ark.cn-beijing.volces.com/api/v3",
+      "description": "API 基础 URL"
+    },
+    "defaultRatio": {
+      "type": "string",
+      "required": false,
+      "default": "16:9",
+      "description": "默认视频比例"
+    },
+    "defaultDuration": {
+      "type": "number",
+      "required": false,
+      "default": 8,
+      "description": "默认视频时长（秒）"
+    }
+  },
+  "capabilities": {
+    "multimodal": true,
+    "referenceImages": true,
+    "referenceVideo": true,
+    "referenceAudio": true,
+    "audioGeneration": true,
+    "storyPlanning": true,
+    "characterDNA": true,
+    "storyboard": true,
+    "promptEngineering": true,
+    "projectManagement": true
+  }
+}
