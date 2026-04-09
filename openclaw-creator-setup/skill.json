@@ -1,7 +1,7 @@
 {
   "name": "openclaw-creator-setup",
-  "version": "2.0.0",
-  "description": "OpenClaw 内容创作者快速配置工具 v2.0 - 真实可用版本，帮助自媒体人一键搭建创作环境",
+  "version": "3.0.0",
+  "description": "OpenClaw 内容创作者快速配置工具 v3.0 - 真正可用的独立 Skill，完整的环境检测与工作流管理",
   "author": "郑宇航",
   "license": "MIT",
   "keywords": [
