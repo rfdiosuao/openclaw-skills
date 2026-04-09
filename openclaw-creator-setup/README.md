@@ -1,10 +1,9 @@
-# 🎨 OpenClaw 内容创作者快速配置工具
+# 🎨 OpenClaw 内容创作者快速配置工具 v2.0
 
-> 帮助内容创作者快速配置 OpenClaw 环境，一键搭建自媒体创作工作流
+> **真实可用版本** - 帮助内容创作者快速配置 OpenClaw 环境，一键搭建自媒体创作工作流
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://clawhub.ai/skills/openclaw-creator-setup)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://clawhub.ai/skills/openclaw-creator-setup)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
 ---
 
@@ -16,29 +15,37 @@
 - [配置说明](#-配置说明)
 - [命令参考](#-命令参考)
 - [常见问题](#-常见问题)
-- [开发贡献](#-开发贡献)
 
 ---
 
 ## 🚀 功能特性
 
-### 1. 快速配置
-- ✅ 一键安装必要组件
-- ✅ 自动化环境设置
-- ✅ 预设内容创作模板
-- ✅ 智能环境检测
+### ✅ 真实可用的功能
 
-### 2. 创作者工具包
-- 📝 文案生成工具
-- 🎬 视频处理工具链
-- 📱 社交媒体集成
-- 📊 数据分析面板
+1. **环境检测与配置**
+   - ✅ 检测飞书授权状态
+   - ✅ 检测已安装的 Skills
+   - ✅ 自动建议需要安装的 Skills
+   - ✅ 验证配置完整性
 
-### 3. 工作流模板
-- 🔄 内容创作流程自动化
-- 🚀 多平台发布工作流
-- ⏰ 定时任务配置
-- 🔗 数据同步设置
+2. **工作流模板**
+   - ✅ 每日内容创作工作流
+   - ✅ 周报生成工作流
+   - ✅ 会议记录工作流
+   - ✅ 自定义工作流创建
+
+3. **平台配置**
+   - ✅ 支持微信公众号
+   - ✅ 支持微博
+   - ✅ 支持抖音
+   - ✅ 支持小红书
+   - ✅ 支持 B 站
+   - ✅ 支持知乎
+
+4. **自然语言交互**
+   - ✅ 支持中文自然语言命令
+   - ✅ 智能意图识别
+   - ✅ 友好的错误提示
 
 ---
 
@@ -47,219 +54,292 @@
 ### 安装
 
 ```bash
-# 使用 Claw-CLI 安装
-claw skill install openclaw-creator-setup
+# 使用 ClawHub CLI 安装
+clawhub install openclaw-creator-setup
+
+# 或使用 OpenClaw 原生命令
+openclaw skills install openclaw-creator-setup
 ```
 
-### 初始化
+### 使用
 
-```bash
-# 执行完整环境配置
-claw skill run openclaw-creator-setup setup
+**在飞书中对机器人说：**
+
+```
+安装内容创作者工具
 ```
 
-### 验证安装
+或
 
-```bash
-# 检查环境状态
-claw skill run openclaw-creator-setup check
+```
+配置内容创作者环境
 ```
 
 ---
 
 ## 💡 使用指南
 
-### 基础使用
+### 基础命令
 
-```typescript
-import { OpenClawCreatorSetup } from 'openclaw-creator-setup';
+| 飞书命令 | 功能 |
+|----------|------|
+| `安装内容创作者工具` | 执行完整环境配置 |
+| `检查创作者环境` | 查看当前状态 |
+| `配置平台 <平台名>` | 添加发布平台 |
+| `创建工作流 <名称>` | 创建新工作流 |
 
-// 创建实例
-const setup = new OpenClawCreatorSetup(context);
+### 使用示例
 
-// 执行完整配置
-await setup.setup();
+#### 1. 执行完整配置
 
-// 检查环境状态
-const status = await setup.check();
+```
+安装内容创作者工具
 ```
 
-### 配置发布平台
+**输出：**
+```
+🚀 开始配置内容创作者环境...
 
-```typescript
-// 配置需要发布的平台
-await setup.configurePlatforms(['wechat', 'weibo', 'xiaohongshu']);
+✅ 飞书已授权（郑宇航）
+✅ 已检测到 5 个常用 Skills:
+   feishu-bitable, feishu-calendar, feishu-task, feishu-create-doc, web_search
+✅ 所有必要 Skills 已安装
+✅ 已配置 3 个工作流模板:
+• 每日内容创作（触发词："每日内容"）
+• 周报生成（触发词："周报"）
+• 会议记录（触发词："会议记录"）
+
+📋 配置检查:
+✅ 飞书授权
+✅ Skills 安装
+✅ 工作流配置
+
+✅ 所有检查通过！
+
+✅ 内容创作者环境配置完成！
+
+💡 使用提示：
+• 说 "检查创作者环境" 查看状态
+• 说 "创建工作流 <名称>" 创建新工作流
+• 说 "配置平台 <平台名>" 添加发布平台
 ```
 
-### 创建工作流
+#### 2. 检查环境状态
 
-```typescript
-// 创建自定义工作流
-await setup.createWorkflow('daily-content', {
-  schedule: '0 9 * * *',
-  platforms: ['wechat', 'weibo']
-});
+```
+检查创作者环境
+```
+
+**输出：**
+```
+📊 内容创作者环境状态
+====================
+飞书授权：✅ 已授权
+已安装 Skills: 5 个
+工作流：3 个
+
+已安装 Skills:
+  feishu-bitable, feishu-calendar, feishu-task, feishu-create-doc, web_search
+
+可用工作流:
+  • 每日内容创作 (已启用)
+  • 周报生成 (已启用)
+  • 会议记录 (已启用)
+```
+
+#### 3. 配置发布平台
+
+```
+配置平台 wechat weibo
+```
+
+**输出：**
+```
+✅ 已配置发布平台：wechat, weibo
+
+💡 在飞书中说 "发布到 <平台名>" 即可使用
+```
+
+#### 4. 创建工作流
+
+```
+创建工作流 每日内容
+```
+
+**输出：**
+```
+✅ 工作流 "每日内容" 创建成功！
+触发词："每日内容"
+
+💡 说 "配置工作流 每日内容" 来添加具体动作
 ```
 
 ---
 
 ## ⚙️ 配置说明
 
-### 环境变量
+### 支持的平台
 
-| 变量名 | 说明 | 默认值 |
-|--------|------|--------|
-| `CREATOR_PLATFORMS` | 发布平台列表 | `wechat,weibo,douyin` |
-| `AUTO_PUBLISH` | 自动发布 | `false` |
-| `ANALYTICS_ENABLED` | 启用数据分析 | `true` |
-
-### 平台支持
-
-| 平台 | 状态 | 说明 |
+| 平台 | 标识 | 说明 |
 |------|------|------|
-| 微信公众号 | ✅ 支持 | 需要公众号授权 |
-| 微博 | ✅ 支持 | 需要微博开发者账号 |
-| 抖音 | ✅ 支持 | 需要抖音开放平台 |
-| 小红书 | 🚧 开发中 | 敬请期待 |
-| B 站 | 🚧 开发中 | 敬请期待 |
+| 微信公众号 | wechat | 公众号文章发布 |
+| 微博 | weibo | 微博内容发布 |
+| 抖音 | douyin | 抖音视频发布 |
+| 小红书 | xiaohongshu | 小红书笔记发布 |
+| B 站 | bilibili | B 站视频发布 |
+| 知乎 | zhihu | 知乎文章发布 |
+
+### 预设工作流
+
+#### 1. 每日内容创作
+
+**触发词：** `每日内容`
+
+**动作：**
+1. 搜索今日热点话题
+2. 生成创作灵感
+3. 创建飞书文档草稿
+4. 提醒发布时间
+
+#### 2. 周报生成
+
+**触发词：** `周报`
+
+**动作：**
+1. 收集本周任务完成情况
+2. 整理本周文档更新
+3. 生成周报文档
+4. 发送给指定人员
+
+#### 3. 会议记录
+
+**触发词：** `会议记录`
+
+**动作：**
+1. 创建会议记录文档
+2. 记录会议要点
+3. 生成待办任务
+4. 发送给参会人员
 
 ---
 
 ## 🔧 命令参考
 
-| 命令 | 参数 | 说明 | 示例 |
-|------|------|------|------|
-| `setup` | 无 | 执行完整环境配置 | `setup` |
-| `check` | 无 | 检查环境状态 | `check` |
-| `configure-platforms` | `platforms: string[]` | 配置发布平台 | `configure-platforms wechat weibo` |
-| `create-workflow` | `name: string, config?: object` | 创建工作流 | `create-workflow daily-content` |
+### 环境配置
 
----
+| 命令 | 参数 | 说明 |
+|------|------|------|
+| `安装内容创作者工具` | 无 | 执行完整环境配置 |
+| `检查创作者环境` | 无 | 查看当前状态 |
 
-## 📝 使用场景
+### 平台管理
 
-### 场景 1: 自媒体运营
+| 命令 | 参数 | 说明 |
+|------|------|------|
+| `配置平台` | `<平台名...>` | 添加发布平台 |
 
-快速搭建多平台内容发布环境，实现一次创作、多平台分发。
-
-```bash
-# 配置多平台
-claw skill run openclaw-creator-setup configure-platforms wechat weibo douyin
-
-# 创建发布工作流
-claw skill run openclaw-creator-setup create-workflow multi-platform-publish
+**示例：**
+```
+配置平台 wechat weibo douyin
 ```
 
-### 场景 2: 内容创作者
+### 工作流管理
 
-自动化内容生产流程，提高效率。
-
-```bash
-# 执行完整配置
-claw skill run openclaw-creator-setup setup
-
-# 创建内容日历工作流
-claw skill run openclaw-creator-setup create-workflow content-calendar
-```
-
-### 场景 3: 社交媒体管理
-
-统一管理多个社交媒体账号，定时发布。
-
-```bash
-# 配置所有平台
-claw skill run openclaw-creator-setup configure-platforms wechat weibo douyin xiaohongshu
-
-# 创建定时发布工作流
-claw skill run openclaw-creator-setup create-workflow scheduled-publish
-```
+| 命令 | 参数 | 说明 |
+|------|------|------|
+| `创建工作流` | `<名称>` | 创建新工作流 |
+| `配置工作流` | `<名称>` | 配置工作流动作 |
+| `启用工作流` | `<名称>` | 启用工作流 |
+| `禁用工作流` | `<名称>` | 禁用工作流 |
 
 ---
 
 ## 🐛 常见问题
 
-### Q: 安装失败怎么办？
+### Q: 安装后没反应？
 
-**A:** 检查以下几点：
-1. Node.js 版本 >= 18.0.0
-2. 网络连接正常
-3. Claw-CLI 已正确安装
+**A:** 请确保：
+1. OpenClaw 版本 ≥ 2026.3.0
+2. 已正确安装 Skill
+3. 在飞书中使用本机器人
 
-```bash
-# 检查 Node.js 版本
-node -v
-
-# 更新 Claw-CLI
-npm install -g claw-cli
+**检查命令：**
+```
+检查创作者环境
 ```
 
-### Q: 如何配置微信发布？
+### Q: 如何添加新的工作流？
 
-**A:** 运行配置命令并按提示授权：
-
-```bash
-claw skill run openclaw-creator-setup configure-platforms wechat
+**A:** 使用以下命令：
+```
+创建工作流 <工作流名称>
 ```
 
-然后根据指引完成微信公众号授权。
-
-### Q: 工作流不执行？
-
-**A:** 检查以下几点：
-1. 定时任务配置是否正确
-2. 平台授权是否有效
-3. 查看日志输出
-
-```bash
-# 查看详细日志
-claw skill run openclaw-creator-setup check
+然后配置具体动作：
+```
+配置工作流 <工作流名称>
 ```
 
-### Q: 如何自定义工作流？
+### Q: 支持哪些发布平台？
 
-**A:** 参考 [工作流配置文档](./docs/workflow.md) 进行自定义配置。
+**A:** 目前支持：
+- 微信公众号
+- 微博
+- 抖音
+- 小红书
+- B 站
+- 知乎
 
----
+### Q: 如何删除已配置的平台？
 
-## 🛠️ 开发贡献
-
-### 本地开发
-
-```bash
-# 克隆仓库
-git clone https://github.com/rfdiosuao/openclaw-skills.git
-
-# 进入目录
-cd openclaw-skills/openclaw-creator-setup
-
-# 安装依赖
-npm install
-
-# 开发模式
-npm run dev
-
-# 构建
-npm run build
-
-# 测试
-npm test
+**A:** 目前不支持删除，但可以通过重新配置来覆盖：
+```
+配置平台 wechat
 ```
 
-### 发布更新
+### Q: 工作流如何触发？
 
-```bash
-# 更新版本号
-npm version patch  # 或 minor / major
+**A:** 在飞书中说出工作流的触发词即可：
+```
+每日内容
+```
 
-# 发布到 ClawHub
-claw skill publish
+或
+
+```
+周报
 ```
 
 ---
 
-## 📄 许可证
+## 📝 更新日志
 
-MIT License - 详见 [LICENSE](./LICENSE) 文件
+### v2.0.0 (2026-04-09) - 真实可用版本
+
+**新增功能：**
+- ✅ 完整的环境检测与配置
+- ✅ 飞书授权状态检查
+- ✅ Skills 安装状态检测
+- ✅ 工作流模板系统
+- ✅ 自然语言交互支持
+- ✅ 平台配置管理
+
+**修复问题：**
+- ✅ 修复了 v1.0 只有框架没有实际功能的问题
+- ✅ 添加了真实的工具调用逻辑
+- ✅ 实现了完整的错误处理
+
+### v1.0.0 (2026-04-09) - 初始版本
+
+- ⚠️ 仅框架代码，无实际功能（已废弃）
+
+---
+
+## 🔗 相关资源
+
+- [ClawHub Skill 页面](https://clawhub.ai/skills/openclaw-creator-setup)
+- [OpenClaw 官方文档](https://docs.openclaw.ai)
+- [GitHub 仓库](https://github.com/rfdiosuao/openclaw-skills/tree/main/openclaw-creator-setup)
 
 ---
 
@@ -267,15 +347,12 @@ MIT License - 详见 [LICENSE](./LICENSE) 文件
 
 **郑宇航**
 - GitHub: [@rfdiosuao](https://github.com/rfdiosuao)
-- 公众号：关注获取更多 OpenClaw 教程
-
----
-
-## 🙏 致谢
-
-感谢 OpenClaw 社区和所有贡献者！
 
 ---
 
 **最后更新:** 2026-04-09  
-**版本:** v1.0.0
+**版本:** v2.0.0
+
+---
+
+官网:heang.top
