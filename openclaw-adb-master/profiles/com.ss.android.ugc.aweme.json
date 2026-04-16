@@ -1,0 +1,65 @@
+{
+  "package_name": "com.ss.android.ugc.aweme",
+  "name": "抖音",
+  "version": "1.0.0",
+  "deep_links": {
+    "search": "snssdk1128://search/result?keyword={keyword}&type={type}",
+    "user": "snssdk1128://user/profile/{user_id}",
+    "live": "snssdk1128://live?room_id={room_id}",
+    "video": "snssdk1128://video/{video_id}"
+  },
+  "known_layouts": {
+    "search_button": {
+      "text": "搜索",
+      "position": "top_right",
+      "description": "Top right search button"
+    },
+    "home_tab": {
+      "text": "首页",
+      "position": "bottom_nav_0",
+      "description": "Bottom navigation - Home"
+    },
+    "friends_tab": {
+      "text": "朋友",
+      "position": "bottom_nav_1",
+      "description": "Bottom navigation - Friends"
+    },
+    "create_tab": {
+      "text": "+",
+      "position": "bottom_nav_2",
+      "description": "Bottom navigation - Create"
+    },
+    "message_tab": {
+      "text": "消息",
+      "position": "bottom_nav_3",
+      "description": "Bottom navigation - Messages"
+    },
+    "me_tab": {
+      "text": "我",
+      "position": "bottom_nav_4",
+      "description": "Bottom navigation - Me"
+    }
+  },
+  "workarounds": {
+    "video_playing": "Tap screen center to pause before UI dump, wait 1s",
+    "chinese_input": "Use deep links instead of type command for Chinese text",
+    "onboarding": "Look for '跳过' (skip) or '同意' (agree) buttons on first launch",
+    "login_dialog": "Tap '取消' (cancel) or outside the dialog to dismiss"
+  },
+  "common_texts": {
+    "skip": "跳过",
+    "agree": "同意",
+    "allow": "允许",
+    "cancel": "取消",
+    "confirm": "确认",
+    "ok": "确定",
+    "search": "搜索",
+    "loading": "加载中"
+  },
+  "tips": [
+    "Use deep links for search instead of UI navigation",
+    "Always pause video before dumping UI",
+    "Bottom navigation tabs are stable targets",
+    "Watch for permission dialogs on first launch"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "ffmpeg-video-concat",
+  "version": "1.0.0",
+  "description": "FFmpeg 视频拼接大师 - 专业级多视频无缝拼接工具",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "ffmpeg",
+    "video",
+    "concat",
+    "merge",
+    "openclaw",
+    "skill"
+  ],
+  "author": "Spark",
+  "license": "MIT",
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/fluent-ffmpeg": "^2.1.24",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  }
+}

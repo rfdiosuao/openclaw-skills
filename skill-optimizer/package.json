@@ -1,0 +1,33 @@
+{
+  "name": "skill-optimizer",
+  "version": "1.0.0",
+  "description": "Skill 工作区优化管理器，扫描分析所有 Skill，推荐合并/删除/优化方案",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "publish": "claw skill publish"
+  },
+  "keywords": [
+    "skill",
+    "optimizer",
+    "context",
+    "management",
+    "openclaw",
+    "clawhub"
+  ],
+  "author": "Spark <openclaw-skill-master>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

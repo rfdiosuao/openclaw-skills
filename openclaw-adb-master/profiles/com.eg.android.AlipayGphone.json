@@ -1,0 +1,70 @@
+{
+  "package_name": "com.eg.android.AlipayGphone",
+  "name": "支付宝",
+  "version": "1.0.0",
+  "deep_links": {
+    "scan": "alipayqr://platformapi/startapp?saId=10000007",
+    "pay": "alipays://platformapi/startapp?appId=09999988&url={url}",
+    "transfer": "alipays://platformapi/startapp?saId=10000001&userId={user_id}",
+    "red_packet": "alipays://platformapi/startapp?appId=20000001",
+    "wealth": "alipays://platformapi/startapp?appId=20000067"
+  },
+  "known_layouts": {
+    "home_tab": {
+      "text": "首页",
+      "position": "bottom_nav_0",
+      "description": "Bottom navigation - Home"
+    },
+    "wealth_tab": {
+      "text": "理财",
+      "position": "bottom_nav_1",
+      "description": "Bottom navigation - Wealth"
+    },
+    "life_tab": {
+      "text": "生活",
+      "position": "bottom_nav_2",
+      "description": "Bottom navigation - Life"
+    },
+    "message_tab": {
+      "text": "消息",
+      "position": "bottom_nav_3",
+      "description": "Bottom navigation - Messages"
+    },
+    "me_tab": {
+      "text": "我的",
+      "position": "bottom_nav_4",
+      "description": "Bottom navigation - Me"
+    },
+    "scan_button": {
+      "text": "扫一扫",
+      "position": "top_right",
+      "description": "Top right scan button"
+    },
+    "pay_button": {
+      "text": "收付款",
+      "position": "top_right",
+      "description": "Top right pay button"
+    }
+  },
+  "workarounds": {
+    "security_check": "May require fingerprint or face recognition",
+    "password_input": "Use custom password keyboard, not standard input",
+    "sms_verify": "Wait for SMS code to arrive"
+  },
+  "common_texts": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "ok": "确定",
+    "pay": "付款",
+    "receive": "收款",
+    "transfer": "转账",
+    "search": "搜索",
+    "scan": "扫一扫"
+  },
+  "tips": [
+    "Alipay has strict security, may require biometric auth",
+    "Use deep links for common actions like scan/pay",
+    "Password input requires special handling",
+    "Some features may be region-locked"
+  ]
+}

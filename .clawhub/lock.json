@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "context-monitor-helper": {
+      "version": "1.0.0",
+      "installedAt": 1775399492028
+    },
+    "openclaw-creator-setup": {
+      "version": "1.0.0",
+      "installedAt": 1775722524198
+    },
+    "feishu-ai-coding-assistant": {
+      "version": "1.0.0",
+      "installedAt": 1775723590760
+    }
+  }
+}

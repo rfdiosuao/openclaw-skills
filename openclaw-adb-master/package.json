@@ -1,0 +1,11 @@
+{
+  "name": "openclaw-adb-master",
+  "version": "1.0.0",
+  "description": "顶尖 ADB 控制 Skill",
+  "scripts": {
+    "test": "echo 'Tests coming soon'"
+  },
+  "bin": {
+    "adb-master": "./scripts/adb-master.sh"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "owner": "aadipapp",
+  "slug": "android-transfer-skill",
+  "displayName": "MacAndroidTransfer",
+  "latest": {
+    "version": "1.0.0",
+    "publishedAt": 1771129683141,
+    "commit": "https://github.com/openclaw/skills/commit/037b065c17c7dd76527ce5ff66594f678a3b117c"
+  },
+  "history": []
+}

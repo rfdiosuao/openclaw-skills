@@ -1,0 +1,65 @@
+{
+  "name": "ffmpeg-video-concat",
+  "version": "1.0.0",
+  "description": "FFmpeg 视频拼接大师（macOS 专用版）- 针对 Apple Silicon 和 Intel Mac 深度优化的专业级视频拼接工具",
+  "author": "Spark",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rfdiosuao/openclaw-skills.git",
+    "directory": "ffmpeg-video-concat"
+  },
+  "keywords": [
+    "ffmpeg",
+    "video",
+    "concat",
+    "merge",
+    "macos",
+    "apple-silicon",
+    "m1",
+    "m2",
+    "m3",
+    "videotoolbox",
+    "openclaw",
+    "skill"
+  ],
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "os": [
+    "darwin"
+  ],
+  "bin": {
+    "ffmpeg-concat": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "MACOS_GUIDE.md",
+    "LICENSE"
+  ],
+  "macos": {
+    "brew": {
+      "dependencies": [
+        "ffmpeg"
+      ]
+    },
+    "hwaccel": "videotoolbox",
+    "encoders": [
+      "h264_videotoolbox",
+      "hevc_videotoolbox",
+      "prores_videotoolbox"
+    ],
+    "formats": [
+      "mov",
+      "m4v",
+      "mp4"
+    ]
+  }
+}

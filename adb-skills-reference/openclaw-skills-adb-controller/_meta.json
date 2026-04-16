@@ -1,0 +1,11 @@
+{
+  "owner": "fengyang0317",
+  "slug": "adb-controller",
+  "displayName": "adb controller",
+  "latest": {
+    "version": "1.0.0",
+    "publishedAt": 1772634913911,
+    "commit": "https://github.com/openclaw/skills/commit/594d495efa721811473d293bf5c1f862ec31d271"
+  },
+  "history": []
+}

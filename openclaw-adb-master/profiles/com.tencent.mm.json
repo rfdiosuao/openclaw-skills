@@ -1,0 +1,59 @@
+{
+  "package_name": "com.tencent.mm",
+  "name": "微信",
+  "version": "1.0.0",
+  "deep_links": {
+    "scan": "weixin://scanqrcode",
+    "profile": "weixin://dl/profile?username={username}",
+    "pay": "weixin://wap/pay?orderid={orderid}",
+    "favorite": "weixin://favorite",
+    "settings": "weixin://settings"
+  },
+  "known_layouts": {
+    "chats_tab": {
+      "text": "微信",
+      "position": "bottom_nav_0",
+      "description": "Bottom navigation - Chats"
+    },
+    "contacts_tab": {
+      "text": "通讯录",
+      "position": "bottom_nav_1",
+      "description": "Bottom navigation - Contacts"
+    },
+    "discover_tab": {
+      "text": "发现",
+      "position": "bottom_nav_2",
+      "description": "Bottom navigation - Discover"
+    },
+    "me_tab": {
+      "text": "我",
+      "position": "bottom_nav_3",
+      "description": "Bottom navigation - Me"
+    },
+    "search_bar": {
+      "text": "搜索",
+      "position": "top",
+      "description": "Top search bar"
+    }
+  },
+  "workarounds": {
+    "voice_message": "Long press to record, release to send",
+    "red_packet": "Use precise coordinates for red packet buttons",
+    "mini_program": "May need to wait for loading"
+  },
+  "common_texts": {
+    "send": "发送",
+    "cancel": "取消",
+    "confirm": "确定",
+    "ok": "好",
+    "search": "搜索",
+    "add": "添加",
+    "more": "更多"
+  },
+  "tips": [
+    "WeChat UI is very stable, good for automation",
+    "Use deep links for scanning QR codes",
+    "Bottom navigation tabs are reliable targets",
+    "Mini programs may have different UI structures"
+  ]
+}

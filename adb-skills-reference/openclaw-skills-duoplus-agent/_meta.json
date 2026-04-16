@@ -1,0 +1,22 @@
+{
+  "owner": "duoplusofficial",
+  "slug": "duoplus-agent",
+  "displayName": "DuoPlus CloudPhone Agent",
+  "latest": {
+    "version": "1.0.7",
+    "publishedAt": 1773128762978,
+    "commit": "https://github.com/openclaw/skills/commit/08e16c5df7a1861e13a39b89ac347222aed53a8c"
+  },
+  "history": [
+    {
+      "version": "1.0.6",
+      "publishedAt": 1772764297021,
+      "commit": "https://github.com/openclaw/skills/commit/469ae4e98e7a464eafb59a482d82d98a6e336180"
+    },
+    {
+      "version": "1.0.3",
+      "publishedAt": 1772763088743,
+      "commit": "https://github.com/openclaw/skills/commit/ef570f7f2b8353f7496f984964e03c926868992d"
+    }
+  ]
+}
